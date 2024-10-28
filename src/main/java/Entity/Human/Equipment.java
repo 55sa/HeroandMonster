@@ -1,0 +1,55 @@
+package Entity.Human;
+
+import Entity.Items.Armor;
+import Entity.Items.Weapon;
+
+public class Equipment {
+    private Weapon leftHand;
+
+    private Weapon RightHand;
+
+    private Boolean doubleHand;
+
+    private Armor armor;
+
+    public Equipment(Weapon leftHand, Weapon rightHand, Boolean doubleHand, Armor armor) {
+        this.leftHand = leftHand;
+        this.RightHand = rightHand;
+        this.doubleHand = doubleHand;
+        this.armor = armor;
+    }
+
+    public Weapon getLeftHand() {
+        return leftHand;
+    }
+
+    public void setLeftHand(Weapon leftHand) {
+        this.leftHand = leftHand;
+    }
+
+    public Weapon getRightHand() {
+        return RightHand;
+    }
+
+    public void setRightHand(Weapon rightHand) {
+        RightHand = rightHand;
+    }
+
+    public Boolean getDoubleHand() {
+        return doubleHand;
+    }
+
+    public void setDoubleHand(Boolean doubleHand) {
+        this.doubleHand = doubleHand;
+    }
+
+    public Armor getArmor() {
+        return armor;
+    }
+
+    public void setArmor(Armor armor) {
+        this.armor = armor;
+    }
+
+
+}

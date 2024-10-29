@@ -1,44 +1,68 @@
 package Entity.Board;
 // implementation of board cells
+
+
+
+
 public class Boardcells {
-    private int x;
-    private int y;
-    private Piece value;
+    private int row;            // Row position of the cell
+    private int col;            // Column position of the cell
+    private State state;        // Type of state in the cell
 
-    // Constructor
-    public Boardcells(int x, int y, Piece value) {
-        this.x = x;
-        this.y = y;
-        this.value = value;
+    private Piece piece;
+
+    public State getState() {
+        return state;
     }
 
-    // Getter for x
-    public int getX() {
-        return x;
+    public void setState(State state) {
+        this.state = state;
     }
 
-    // Setter for x
-    public void setX(int x) {
-        this.x = x;
+    public void setPiece(Piece piece) {
+        this.piece = piece;
     }
 
-    // Getter for y
-    public int getY() {
-        return y;
+    // Constructor to initialize position and piece type
+    public Boardcells(int row, int col, State state, Piece piece) {
+        this.row = row;
+        this.col = col;
+        this.state = state;
+        this.piece = piece;
     }
 
-    // Setter for y
-    public void setY(int y) {
-        this.y = y;
+    // Getters and Setters
+    public int getRow() {
+        return row;
     }
 
-    // Getter for value
-    public Piece getValue() {
-        return value;
+    public void setRow(int row) {
+        this.row = row;
     }
 
-    // Setter for value
-    public void setValue(Piece value) {
-        this.value = value;
+    public int getCol() {
+        return col;
+    }
+
+    public void setCol(int col) {
+        this.col = col;
+    }
+
+    public State getPiece() {
+        return state;
+    }
+
+    public void setPiece(State state) {
+        this.state = state;
+    }
+
+    // Override toString for easy debugging and printing cell details
+    @Override
+    public String toString() {
+        return "BoardCell{" +
+                "row=" + row +
+                ", col=" + col +
+                ", piece=" + state +
+                '}';
     }
 }

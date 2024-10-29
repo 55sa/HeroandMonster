@@ -1,18 +1,19 @@
 package Entity.Board;
 
-//pieces in cell implemention
-public class Piece<T> {
-   private T symbol;
+public class Piece {
+   private Object event;
 
-    public T getSymbol() {
-        return symbol;
+    public Object getEvent() {
+        return event;
     }
 
-    public void setSymbol(T symbol) {
-        this.symbol = symbol;
+    public void setEvent(Object event) {
+        this.event = event;
     }
 
-    public Piece(T symbol) {
-        this.symbol = symbol;
+    public Piece(Object event) {
+        this.event = event;
     }
+
+
 }

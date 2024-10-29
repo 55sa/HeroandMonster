@@ -1,37 +1,45 @@
 package Entity.Board;
-//Father class of Board
-public abstract class Board<T> {
- protected int n; //size of board
- protected Boardcells[][] board;
 
+
+public abstract class Board {
+    protected int n; // Size of the board (n x n)
+    protected Boardcells[][] board; // 2D array representing the board grid
+
+    public Board(int n) {
+        this.n = n;
+        this.board = new Boardcells[n][n];
+    }
+
+    // Get the entire board
     public Boardcells[][] getBoard() {
         return board;
     }
 
-    public void setBoard(Boardcells[][] board) {
-        this.board = board;
+    // Get a specific cell on the board
+    public Boardcells getCell(int row, int col) {
+        if (isWithinBounds(row, col)) {
+            return board[row][col];
+        }
+        throw new IndexOutOfBoundsException("Cell position out of bounds");
     }
 
-    public int getN() {
-        return n;
+    // Set a specific cell on the board
+    public void setCell(int row, int col, Boardcells cell) {
+        if (isWithinBounds(row, col)) {
+            board[row][col] = cell;
+        } else {
+            throw new IndexOutOfBoundsException("Cell position out of bounds");
+        }
     }
 
-
-
-    public void setN(int n) {
-        this.n = n;
+    // Check if a position is within board bounds
+    public boolean isWithinBounds(int row, int col) {
+        return row >= 0 && row < n && col >= 0 && col < n;
     }
 
+    // Abstract method to initialize the board (to be implemented in subclasses)
+    protected abstract void initializeBoard();
 
-
-
-
-    public Board(int n) {
-        this.n = n;
-
-    }
-
+    // Abstract method to print the board layout (to be implemented in subclasses)
     public abstract void print();
-
-
 }

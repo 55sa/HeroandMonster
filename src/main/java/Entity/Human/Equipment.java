@@ -5,16 +5,13 @@ import Entity.Items.Weapon;
 
 public class Equipment {
     private Weapon leftHand;
-
-    private Weapon RightHand;
-
+    private Weapon rightHand;
     private Boolean doubleHand;
-
     private Armor armor;
 
     public Equipment(Weapon leftHand, Weapon rightHand, Boolean doubleHand, Armor armor) {
         this.leftHand = leftHand;
-        this.RightHand = rightHand;
+        this.rightHand = rightHand;
         this.doubleHand = doubleHand;
         this.armor = armor;
     }
@@ -28,11 +25,11 @@ public class Equipment {
     }
 
     public Weapon getRightHand() {
-        return RightHand;
+        return rightHand;
     }
 
     public void setRightHand(Weapon rightHand) {
-        RightHand = rightHand;
+        this.rightHand = rightHand;
     }
 
     public Boolean getDoubleHand() {
@@ -50,6 +47,4 @@ public class Equipment {
     public void setArmor(Armor armor) {
         this.armor = armor;
     }
-
-
 }

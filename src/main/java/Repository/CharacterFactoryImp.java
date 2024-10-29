@@ -12,6 +12,8 @@ import Entity.Monster.Spirit;
 //implementation for gameCharacterfactory
 public class CharacterFactoryImp implements CharacterFactory {
 
+
+
     @Override
     public Hero createHero(String type, String name) {
         switch (type.toLowerCase()) {

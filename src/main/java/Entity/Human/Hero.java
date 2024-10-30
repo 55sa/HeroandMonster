@@ -2,6 +2,7 @@ package Entity.Human;
 
 import Entity.Items.Armor;
 import Entity.Items.Item;
+import Entity.Items.Type;
 import Entity.Items.Weapon;
 
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public abstract class Hero {
         this.HP = level * 100; // Initialize HP based on level
         this.MP = level * 50;  // Initialize MP based on level
         this.gold = 100;       // Starting gold
-        this.strength = level * 5;
+        this.strength = 10000;
         this.dexterity = level * 5;
         this.agility = level * 5;
         this.items = new ArrayList<>();
@@ -94,20 +95,56 @@ public abstract class Hero {
     }
 
     // Equip a weapon: handle one-handed and two-handed logic
-    public void equipWeapon(Weapon weapon) {
+    public void equipWeapon(Item item, char hand) {
+        if (item.getType() != Type.WEAPON) {
+            System.out.println("Selected item is not a weapon.");
+            return;
+        }
+
+        Weapon weapon = (Weapon) item; // Cast item to Weapon
+
         if (weapon.getHandsRequired() == 2) {
-            equipment.setLeftHand(weapon);
+            // Double-handed weapon: Equip in right hand by default and clear the left hand
             equipment.setRightHand(weapon);
+            equipment.setLeftHand(null); // Clear the left hand as it requires both hands
             equipment.setDoubleHand(true);
+            System.out.println(name + " has equipped double-handed weapon " + weapon.getName() + " in the right hand.");
         } else {
-            if (equipment.getDoubleHand() || equipment.getRightHand() == null) {
+            // Single-handed weapon
+            if (hand == 'R') {
+                // Equip in right hand; if a double-handed weapon is already equipped, replace it
+                if (equipment.getDoubleHand()) {
+                    equipment.setLeftHand(null); // Clear left hand if replacing double-handed weapon
+                }
                 equipment.setRightHand(weapon);
-            } else {
+                equipment.setDoubleHand(false);
+                System.out.println(name + " has equipped single-handed weapon " + weapon.getName() + " in the right hand.");
+            } else if (hand == 'L') {
+                // Equip in left hand; if a double-handed weapon is already equipped, replace it
+                if (equipment.getDoubleHand()) {
+                    equipment.setRightHand(null); // Clear right hand if replacing double-handed weapon
+                }
                 equipment.setLeftHand(weapon);
+                equipment.setDoubleHand(false);
+                System.out.println(name + " has equipped single-handed weapon " + weapon.getName() + " in the left hand.");
+            } else {
+                System.out.println("Invalid hand choice. Use 'L' for left hand or 'R' for right hand.");
             }
-            equipment.setDoubleHand(false);
         }
     }
+
+
+    public void equipArmor(Item item) {
+        if (item.getType() != Type.ARMOR) {
+            System.out.println("Selected item is not armor.");
+            return;
+        }
+
+        Armor armor = (Armor) item; // Cast item to Armor
+        equipment.setArmor(armor);
+        System.out.println(name + " has equipped " + armor.getName() + ".");
+    }
+
 
     // Equip armor
     public void equipArmor(Armor armor) {

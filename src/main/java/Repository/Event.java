@@ -1,10 +1,7 @@
 package Repository;
 
 import Entity.Board.Board;
-import Entity.Items.Armor;
-import Entity.Items.Potion;
-import Entity.Items.Spell;
-import Entity.Items.Weapon;
+import Entity.Items.*;
 import Entity.Monster.Monster;
 import Entity.Team;
 
@@ -21,9 +18,9 @@ public interface Event<T,U> {
 
   public List<T> avalibleUnit(Team<T> team);
 
-  public void castSpell(U opposingTeam, Spell spell, T cur);
+  public void castSpell(U opposingTeam, Item spell, T cur);
 
-  public void usePotion(T target, Potion potion, T cur);
+  public void usePotion(T target, Item potion, T cur);
 
 
 

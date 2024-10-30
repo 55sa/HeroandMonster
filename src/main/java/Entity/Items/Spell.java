@@ -5,7 +5,7 @@ public class Spell extends Item {
     private int manaCost;        // Mana cost to cast the spell
     private SpellType spellType; // Type of spell (e.g., FIRE, ICE, LIGHTNING)
 
-    public enum SpellType {
+    public  enum SpellType {
         FIRE, ICE, LIGHTNING
     }
 

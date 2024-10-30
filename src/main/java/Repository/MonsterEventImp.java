@@ -1,10 +1,7 @@
 package Repository;
 
 import Entity.Human.Hero;
-import Entity.Items.Armor;
-import Entity.Items.Potion;
-import Entity.Items.Spell;
-import Entity.Items.Weapon;
+import Entity.Items.*;
 import Entity.Monster.Monster;
 import Entity.Team;
 
@@ -56,14 +53,14 @@ public class MonsterEventImp implements Event<Monster, Hero> {
     }
 
     @Override
-    public void castSpell(Hero target, Spell spell, Monster monster) {
+    public void castSpell(Hero target, Item spell, Monster monster) {
 
     }
 
 
 
     @Override
-    public void usePotion(Monster target, Potion potion, Monster monster) {
+    public void usePotion(Monster target, Item potion, Monster monster) {
         // Typically, monsters don't use potions, so this method might be unused or return a message.
 
     }

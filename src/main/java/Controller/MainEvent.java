@@ -19,13 +19,16 @@ public class MainEvent {
     private BattleEvent battleEvent = new BattleEvent();
     private Scanner scanner = new Scanner(System.in);
 
-    Random random =new Random();
+    private State pre = heroBoard.getCell(7, 0).getState();
+
+
+    private Random random =new Random();
 
     private Team<Hero> heroTeam;
 
-    private CharacterFactory characterFactory=new CharacterFactoryImp();
+    private CharacterFactory characterFactory = new CharacterFactoryImp();
 
-    private int heroRow = 0; // Starting row position of the hero
+    private int heroRow = 7; // Starting row position of the hero
     private int heroCol = 0; // Starting column position of the hero
 
     // Display game controls for user
@@ -53,7 +56,9 @@ public class MainEvent {
     // Method to update the hero's position on the board
     private void updateHeroPosition(int newRow, int newCol) {
         // Reset the hero's previous position to a common state
-        heroBoard.getCell(heroRow, heroCol).setState(State.COMMON);
+
+        heroBoard.getCell(heroRow, heroCol).setState(pre);
+        pre = heroBoard.getCell(newRow, newCol).getState();
 
         // Update hero's current row and column position
         heroRow = newRow;
@@ -186,7 +191,8 @@ public class MainEvent {
                     displayInfo(heroTeam);
                     break;
                 case 'm': // Enter market if on a market tile
-                    if (heroBoard.getCell(heroRow, heroCol).getState() == State.MARKET) {
+                    if (heroBoard.getCell(heroRow, heroCol).getPiece() != null &&
+                            heroBoard.getCell(heroRow, heroCol).getPiece().getEvent() instanceof Market) {
                         marketEvent.action((Market) heroBoard.getCell(heroRow, heroCol).getPiece().getEvent(), heroTeam);
                     } else {
                         System.out.println("No market at this location.");

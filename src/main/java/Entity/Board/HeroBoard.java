@@ -111,6 +111,10 @@ public class HeroBoard extends Board {
                     case COMMON:
                         System.out.print(" C |");
                         break;
+                    case HERO:
+                        System.out.print(" * |");
+                        break;
+
                 }
             }
             System.out.println();

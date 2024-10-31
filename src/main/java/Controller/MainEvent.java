@@ -8,6 +8,7 @@ import Entity.Market.Market;
 import Entity.Monster.Monster;
 import Entity.Team;
 import Repository.*;
+import Util.Utils;
 
 import java.util.*;
 
@@ -74,11 +75,18 @@ public class MainEvent {
 
     // Handle hero movement and potential encounters
     private void moveAndCheckForEncounter(int newRow, int newCol) {
+        if(heroBoard.getCell(newRow,newCol).getState()==State.COMMON){
         updateHeroPosition(newRow, newCol);
         if (new Random().nextDouble() < 0.3) { // 30% chance for encounter
             System.out.println("A wild monster appears!");
             Team<Monster> monsterTeam = createMonsterTeam(heroTeam);
             battleEvent.startBattle(heroTeam, monsterTeam);
+        }}
+        else if(heroBoard.getCell(newRow,newCol).getState()==State.INACCESSIBLE){
+            System.out.println("You can not cross the wall!");
+        }
+        else if(heroBoard.getCell(newRow,newCol).getState()==State.MARKET){
+            updateHeroPosition(newRow, newCol);
         }
     }
 
@@ -92,16 +100,23 @@ public class MainEvent {
     // Method to create heroes using CharacterFactory
     private Team<Hero> createHeroes() {
         List<Hero> heroes = new ArrayList<>();
-        System.out.print("Enter the number of heroes you want in your team: ");
-        int numHeroes = scanner.nextInt();
+
+        // Validate the number of heroes input
+        int numHeroes = Utils.getIntInRange(
+                "Enter the number of heroes you want in your team (1 to 3): ", 1, 3
+        );
+
         int createdHeroes = 0;
 
         while (createdHeroes < numHeroes) {
             System.out.println("Creating Hero " + (createdHeroes + 1));
             System.out.print("Enter hero name: ");
             String name = scanner.next();
-            System.out.print("Choose hero class (Warrior, Sorcerer, Paladin): ");
-            String classType = scanner.next();
+
+            // Validate class type
+            String classType = Utils.getStringFromOptions(
+                    "Choose hero class (Warrior, Sorcerer, Paladin): ", new String[]{"Warrior", "Sorcerer", "Paladin"}
+            );
 
             // Create hero using the factory
             Hero hero = characterFactory.createHero(classType, name);
@@ -113,8 +128,9 @@ public class MainEvent {
                 System.out.println("Invalid class type entered. Please choose a valid class (Warrior, Sorcerer, Paladin).");
             }
         }
-        return new Team<Hero>(heroes);
+        return new Team<>(heroes);
     }
+
 
     // Creates a team of monsters based on the hero team's highest level
     private Team<Monster> createMonsterTeam(Team<Hero> heroTeam) {
@@ -126,7 +142,7 @@ public class MainEvent {
         List<Monster> monsters = new ArrayList<>();
         String[] monsterTypes = {"dragon", "exoskeleton", "spirit"};
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < heroTeam.getTeams().size(); i++) {
             String monsterType = monsterTypes[random.nextInt(monsterTypes.length)];
             String monsterName = monsterType + (i + 1); // Name monsters for uniqueness
             Monster monster = characterFactory.createMonster(monsterType, monsterName, highestHeroLevel);
@@ -150,11 +166,12 @@ public class MainEvent {
 
         // Step 2: Place heroes on the board and display the initial setup
         heroBoard.getCell(heroRow, heroCol).setState(State.HERO); // Starting position
-        heroBoard.print();
-        displayInstructions();
+
 
         // Main game loop
         while (choice != 'q') {
+            heroBoard.print();
+            displayInstructions();
             System.out.print("Enter a command: ");
             choice = scanner.next().toLowerCase(Locale.ROOT).charAt(0);
 

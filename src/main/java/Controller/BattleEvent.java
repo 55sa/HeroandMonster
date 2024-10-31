@@ -7,6 +7,7 @@ import Entity.Items.Type;
 import Entity.Monster.Monster;
 import Entity.Team;
 import Repository.*;
+import Util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,7 @@ public class BattleEvent {
         int heroIndex = 0; // Start from the first hero
         int monsterIndex = 0; // Start from the first monster
 
+        // Loop through heroes and monsters until one team wins
         while (heroIndex < heroTeam.getTeams().size() && monsterIndex < monsterTeam.getTeams().size()) {
             Hero hero = heroTeam.getTeams().get(heroIndex);
             Monster monster = monsterTeam.getTeams().get(monsterIndex);
@@ -38,8 +40,13 @@ public class BattleEvent {
                 // Check if monster is defeated
                 if (!monster.isAlive()) {
                     System.out.println(monster.getName() + " is defeated!");
-                    monsterIndex++; // Move to the next monster
-                    continue;
+                    monsterIndex++;  // Move to the next monster
+                    if (heroEvent.win(monsterTeam)) {
+                        System.out.println("Heroes win the battle!");
+                        rewardHeroes(heroTeam);  // Reward heroes
+                        return;  // Exit the battle immediately if heroes win
+                    }
+                    continue;  // Skip to the next loop iteration
                 }
 
                 // Monster's turn
@@ -48,22 +55,19 @@ public class BattleEvent {
                 // Check if hero is defeated
                 if (!hero.isAlive()) {
                     System.out.println(hero.getName() + " is defeated!");
-                    heroIndex++; // Move to the next hero
-                    continue;
+                    heroIndex++;  // Move to the next hero
+                    if (monsterEvent.win(heroTeam)) {
+                        System.out.println("Monsters win the battle. Game Over!");
+                        System.exit(0);  // Exit the battle immediately if monsters win
+                    }
                 }
             }
         }
-
-        // Check if all monsters are defeated
-        if (heroEvent.win(monsterTeam)) {
-            System.out.println("Heroes win the battle!");
-            rewardHeroes(heroTeam);
-        } else {
-            // If all heroes are defeated
-            System.out.println("Monsters win the battle. Game Over!");
-            System.exit(0); // End the game if heroes are defeated
-        }
     }
+
+
+
+
 
 
     // Reward heroes after a victory
@@ -117,28 +121,26 @@ public class BattleEvent {
             System.out.println("4. Equip Weapon");
             System.out.println("5. Equip Armor");
             System.out.println("6. Check Attributes");
-            int choice = scanner.nextInt();
+
+            // Use utils function for input validation
+            int choice = Utils.getIntInRange("Enter a number (1-6): ", 1, 6); // Assume Utils has this input method
 
             switch (choice) {
                 case 1:
                     heroEvent.attack(monster, hero);
-
                     opt = 1;
                     break;
                 case 2:
                     useSpell(hero, monster);
                     opt = 2;
-
                     break;
                 case 3:
                     usePotion(hero);
                     opt = 3;
-
                     break;
                 case 4:
                     useWeapon(hero);
                     opt = 4;
-
                     break;
                 case 5:
                     useArmor(hero);
@@ -153,6 +155,7 @@ public class BattleEvent {
             }
         }
     }
+
 
     private void checkAttributes(Hero hero) {
         System.out.println("Hero Attributes:");

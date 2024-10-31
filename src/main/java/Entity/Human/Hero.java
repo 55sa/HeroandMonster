@@ -31,12 +31,12 @@ public abstract class Hero {
 
     public Hero(String name) {
         this.name = name;
-        this.level = 1;
+        this.level = 10;
         this.exp = 0;
         this.HP = level * 100; // Initialize HP based on level
         this.MP = level * 50;  // Initialize MP based on level
-        this.gold = 100;       // Starting gold
-        this.strength = 100;
+        this.gold = 10000;       // Starting gold
+        this.strength = 10000;
         this.dexterity = level * 5;
         this.agility = level * 5;
         this.items = new ArrayList<>();

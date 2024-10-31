@@ -27,7 +27,9 @@ public class MonsterEventImp implements Event<Monster, Hero> {
 
     @Override
     public void attack(Hero target, Monster monster) {
-        int effectiveDamage = (int) (monster.getDamage() * (1 - target.getEquipment().getArmor().getDamageReduction() / 100.0));
+        int effectiveDamage = (int) (monster.getDamage());
+        if(target.getEquipment().getArmor()!=null){
+       effectiveDamage = (int) (monster.getDamage() * (1 - target.getEquipment().getArmor().getDamageReduction() / 100.0));}
         if (!dodge(target)) {
             target.reduceHealth(effectiveDamage);
             System.out.println(monster.getName() + " attacked " + target.getName() + " for " + effectiveDamage + " damage!");

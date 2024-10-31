@@ -18,6 +18,10 @@ public class MarketEvent {
     private void buy(Market market, Team<Hero> heroTeam) {
         System.out.println("Available products for purchase:");
         List<Item> products = market.getProducts();
+        for (int i = 0; i < products.size(); i++) {
+            Item item = products.get(i);
+            System.out.println((i + 1) + ". " + item.getName() + " - Price: " + item.getPrice() + ", Level: " + item.getLevel());
+        }
         int choice = -1;
 
         while (choice != 0) {

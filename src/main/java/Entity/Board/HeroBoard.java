@@ -44,6 +44,7 @@ public class HeroBoard extends Board {
     }
 
     // Populate each market cell with a unique Market event and items
+    // Populate each market cell with a unique Market event and items
     private void populateMarketsWithUniqueItems() {
         List<Item> allItems = new ArrayList<>(Gamedatabase.ITEMS);
         Collections.shuffle(allItems);
@@ -51,25 +52,24 @@ public class HeroBoard extends Board {
 
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                if (board[i][j].getState() == State.MARKET ) {
-                    int cur = 0;
+                if (board[i][j].getState() == State.MARKET) {
                     List<Item> marketItems = new ArrayList<>();
-                    while (cur < allItems.size() / (n * n * 0.3)){
-                    // Create a new Market with unique items for each market cell
-
-                    if (itemIndex < allItems.size()) {
-                        marketItems.add(allItems.get(itemIndex++)); // Add a unique item
-
+                    for (int k = 0; k < Math.min(3, allItems.size() - itemIndex); k++) {
+                        marketItems.add(allItems.get(itemIndex++));
                     }
-                    cur++;
-                    }
+                    Market market = new Market(marketItems);
+                    board[i][j].setPiece(new Piece(market));
 
-                    Market market = new Market(marketItems); // Create a Market event
-                    board[i][j].setPiece(new Piece(market)); // Assign Market to the Piece
+//                     Debugging check
+//                    System.out.println("Market created at (" + i + ", " + j + ") with items:");
+//                    for (Item item : marketItems) {
+//                        System.out.println(" - " + item.getName());
+//                    }
                 }
             }
         }
     }
+
 
     private void shuffleBoard() {
         Random random = new Random();

@@ -69,8 +69,8 @@ public abstract class Monster {
 
     public void reduceHealth(int amount) {
         int effectiveDamage = Math.max(0, amount - defense);
-        setHP(this.HP - effectiveDamage);
-        System.out.println(name + " takes " + effectiveDamage + " damage, HP now at " + this.HP + ".");
+        setHP(HP - effectiveDamage);
+        System.out.println(name + " takes " + effectiveDamage + " damage, HP now at " + HP + ".");
     }
 
     public void reduceDefense(double reduction) {

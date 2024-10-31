@@ -120,23 +120,23 @@ public class HeroEventImp implements Event<Hero, Monster> {
     // Hero uses a potion on themselves or another hero
     @Override
     public void usePotion(Hero target, Item potion, Hero user) {
-        String statType = (String) potion.getInfo().get("statType");
+        Potion.StatType statType = (Potion.StatType) potion.getInfo().get("statType");
         int effectAmount = (int) potion.getInfo().get("effectAmount");
 
         switch (statType) {
-            case "HP":
+            case HP:
                 target.increaseHealth(effectAmount);
                 break;
-            case "MP":
+            case MP:
                 target.increaseMana(effectAmount);
                 break;
-            case "STRENGTH":
+            case STRENGTH:
                 target.setStrength(target.getStrength() + effectAmount);
                 break;
-            case "DEXTERITY":
+            case DEXTERITY:
                 target.setDexterity(target.getDexterity() + effectAmount);
                 break;
-            case "AGILITY":
+            case AGILITY:
                 target.setAgility(target.getAgility() + effectAmount);
                 break;
             default:

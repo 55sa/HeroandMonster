@@ -19,6 +19,10 @@ public class Boardcells {
         this.state = state;
     }
 
+    public Piece getPiece() {
+        return piece;
+    }
+
     public void setPiece(Piece piece) {
         this.piece = piece;
     }
@@ -48,13 +52,7 @@ public class Boardcells {
         this.col = col;
     }
 
-    public State getPiece() {
-        return state;
-    }
 
-    public void setPiece(State state) {
-        this.state = state;
-    }
 
     // Override toString for easy debugging and printing cell details
     @Override

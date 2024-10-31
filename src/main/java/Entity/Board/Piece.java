@@ -1,7 +1,7 @@
 package Entity.Board;
 
 public class Piece {
-   private Object event;
+    private Object event;
 
     public Object getEvent() {
         return event;

@@ -24,7 +24,7 @@ public class CharacterFactoryImp implements CharacterFactory {
             case "paladin":
                 return new Paladin(name);
             default:
-                throw new IllegalArgumentException("Unknown hero type: " + type);
+                return null;
         }
     }
 
@@ -38,7 +38,7 @@ public class CharacterFactoryImp implements CharacterFactory {
             case "spirit":
                 return new Spirit(name, level);
             default:
-                throw new IllegalArgumentException("Unknown monster type: " + type);
+                return null;
         }
     }
 }

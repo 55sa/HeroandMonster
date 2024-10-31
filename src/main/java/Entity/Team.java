@@ -9,6 +9,9 @@ public class Team <T>{
         this.teams = teams;
     }
 
+    public Team() {
+    }
+
     public void addMember(T member){
 
         teams.add(member);

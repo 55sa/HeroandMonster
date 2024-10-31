@@ -11,6 +11,7 @@ import java.util.List;
 public abstract class Hero {
     protected String name;
     protected int level;
+    protected int exp;
     protected int HP;
     protected int MP;
     protected int gold;
@@ -20,13 +21,22 @@ public abstract class Hero {
     protected Equipment equipment;
     private List<Item> items;
 
+    public int getExp() {
+        return exp;
+    }
+
+    public void setExp(int exp) {
+        this.exp = exp;
+    }
+
     public Hero(String name) {
         this.name = name;
         this.level = 1;
+        this.exp = 0;
         this.HP = level * 100; // Initialize HP based on level
         this.MP = level * 50;  // Initialize MP based on level
         this.gold = 100;       // Starting gold
-        this.strength = 10000;
+        this.strength = 100;
         this.dexterity = level * 5;
         this.agility = level * 5;
         this.items = new ArrayList<>();
@@ -143,6 +153,53 @@ public abstract class Hero {
         Armor armor = (Armor) item; // Cast item to Armor
         equipment.setArmor(armor);
         System.out.println(name + " has equipped " + armor.getName() + ".");
+    }
+
+    // Add experience and handle level-up if experience threshold is reached
+    public void addExp(int amount) {
+        exp += amount;
+        int expThreshold = level * 10; // Experience required to level up
+
+        while (exp >= expThreshold) { // Loop to handle multiple level-ups
+            exp -= expThreshold; // Deduct threshold amount for level-up
+            levelUp();
+            expThreshold = level * 10; // Update threshold for the new level
+        }
+    }
+
+    // Method to handle leveling up: resets HP, MP, and improves skills
+    private void levelUp() {
+        level++; // Increment level
+
+        // Reset HP and update MP
+        HP = level * 100; // Reset HP to level-based formula
+        MP *= 1.1; // Increase current mana by 10%
+
+        // Increase all skills by 5%, and favored skills by an extra 5%
+        strength += (int) (strength * 0.05); // Increase strength by 5%
+        dexterity += (int) (dexterity * 0.05); // Increase dexterity by 5%
+        agility += (int) (agility * 0.05); // Increase agility by 5%
+
+        // Additional favored skill increases if applicable
+        strength += (int) (strength * 0.05); // Extra 5% for favored skill
+        System.out.println(name + " leveled up to " + level + "! New stats:");
+        displayStats(); // Show updated stats
+    }
+
+    // Method to display hero's current stats
+    public void displayStats() {
+        System.out.println("Level: " + level);
+        System.out.println("HP: " + HP);
+        System.out.println("MP: " + MP);
+        System.out.println("Strength: " + strength);
+        System.out.println("Dexterity: " + dexterity);
+        System.out.println("Agility: " + agility);
+    }
+
+    public void revive(){
+        HP = (int) (level * 100 * 0.5);
+        MP *= (int) (level * 50 * 0.5);
+
     }
 
 

@@ -5,6 +5,7 @@ import Entity.Items.Item;
 import Entity.Items.Spell;
 import Entity.Items.Type;
 import Entity.Monster.Monster;
+import Entity.Team;
 import Repository.*;
 
 import java.util.ArrayList;
@@ -13,16 +14,97 @@ import java.util.Scanner;
 
 public class BattleEvent {
 
-  private   CharacterFactory characterFactory=new CharacterFactoryImp();
-  private   ItemFactory itemFactory = new ItemFactoryImp();
+    private CharacterFactory characterFactory = new CharacterFactoryImp();
+    private ItemFactory itemFactory = new ItemFactoryImp();
+    private Event<Hero, Monster> heroEvent = new HeroEventImp();
+    private Event<Monster, Hero> monsterEvent = new MonsterEventImp();
+    private Scanner scanner = new Scanner(System.in);
 
-  private   Event<Hero, Monster> heroEvent = new HeroEventImp();
+    // Method to start a battle between hero and monster teams
+    public void startBattle(Team<Hero> heroTeam, Team<Monster> monsterTeam) {
+        System.out.println("The battle begins!");
 
-  private   Event<Monster, Hero> monsterEvent = new MonsterEventImp();
+        int heroIndex = 0; // Start from the first hero
+        int monsterIndex = 0; // Start from the first monster
 
-  private Scanner scanner = new Scanner(System.in);
+        while (heroIndex < heroTeam.getTeams().size() && monsterIndex < monsterTeam.getTeams().size()) {
+            Hero hero = heroTeam.getTeams().get(heroIndex);
+            Monster monster = monsterTeam.getTeams().get(monsterIndex);
+
+            if (hero.isAlive() && monster.isAlive()) {
+                // Hero's turn
+                heroTurn(hero, monster);
+
+                // Check if monster is defeated
+                if (!monster.isAlive()) {
+                    System.out.println(monster.getName() + " is defeated!");
+                    monsterIndex++; // Move to the next monster
+                    continue;
+                }
+
+                // Monster's turn
+                monsterEvent.attack(hero, monster);
+
+                // Check if hero is defeated
+                if (!hero.isAlive()) {
+                    System.out.println(hero.getName() + " is defeated!");
+                    heroIndex++; // Move to the next hero
+                    continue;
+                }
+            }
+        }
+
+        // Check if all monsters are defeated
+        if (heroEvent.win(monsterTeam)) {
+            System.out.println("Heroes win the battle!");
+            rewardHeroes(heroTeam);
+        } else {
+            // If all heroes are defeated
+            System.out.println("Monsters win the battle. Game Over!");
+            System.exit(0); // End the game if heroes are defeated
+        }
+    }
 
 
+    // Reward heroes after a victory
+    private void rewardHeroes(Team<Hero> heroTeam) {
+        int expReward = 100;
+        int goldReward = 50;
+
+        System.out.println("Distributing rewards to surviving heroes...");
+
+        for (Hero hero : heroTeam.getTeams()) {
+            if (hero.isAlive()) {
+                hero.setHP((int) (hero.getHP() * 1.1));
+                hero.setMP((int) (hero.getMP() * 1.1));
+                hero.addExp(expReward);
+                hero.setGold(hero.getGold() + goldReward);
+                System.out.println(hero.getName() + " receives " + expReward + " EXP and " + goldReward + " gold.");
+            } else {
+                hero.revive();
+            }
+        }
+    }
+
+    // Selects an alive monster from the monster team
+    private Monster selectAliveMonster(Team<Monster> monsterTeam) {
+        for (Monster monster : monsterTeam.getTeams()) {
+            if (monster.isAlive()) {
+                return monster;
+            }
+        }
+        return null;
+    }
+
+    // Selects an alive hero from the hero team
+    private Hero selectAliveHero(Team<Hero> heroTeam) {
+        for (Hero hero : heroTeam.getTeams()) {
+            if (hero.isAlive()) {
+                return hero;
+            }
+        }
+        return null;
+    }
 
     private void heroTurn(Hero hero, Monster monster) {
         int opt = 0;
@@ -40,23 +122,23 @@ public class BattleEvent {
             switch (choice) {
                 case 1:
                     heroEvent.attack(monster, hero);
-                    monsterEvent.attack(hero, monster);
+
                     opt = 1;
                     break;
                 case 2:
                     useSpell(hero, monster);
                     opt = 2;
-                    monsterEvent.attack(hero, monster);
+
                     break;
                 case 3:
                     usePotion(hero);
                     opt = 3;
-                    monsterEvent.attack(hero, monster);
+
                     break;
                 case 4:
                     useWeapon(hero);
                     opt = 4;
-                    monsterEvent.attack(hero, monster);
+
                     break;
                 case 5:
                     useArmor(hero);
@@ -84,11 +166,11 @@ public class BattleEvent {
         System.out.println("Equipped Armor: " + (hero.getEquipment().getArmor() != null ? hero.getEquipment().getArmor().getName() : "None"));
     }
 
+    // Method to let heroes cast spells on monsters with mana check
     private void useSpell(Hero hero, Monster target) {
         List<Item> spells = new ArrayList<>();
         List<Item> inventory = hero.getItems();
 
-        // Gather all spells from hero's inventory
         for (Item item : inventory) {
             if (item.getType().equals(Type.SPELL)) {
                 spells.add(item);
@@ -100,31 +182,36 @@ public class BattleEvent {
             return;
         }
 
-        // Display available spells for the user to choose
-        int choice = 0;
-        while(choice == 0 || choice < 0 || choice > spells.size()){
-        System.out.println("Select a spell to use:");
-        for (int i = 0; i < spells.size(); i++) {
-            System.out.println((i + 1) + ". " + spells.get(i).getName());
-        }
+        int choice;
+        do {
+            System.out.println("Select a spell to use:");
+            for (int i = 0; i < spells.size(); i++) {
+                System.out.println((i + 1) + ". " + spells.get(i).getName() +
+                        " (Mana Cost: " + ((Spell) spells.get(i)).getManaCost() + ")");
+            }
 
+            choice = scanner.nextInt();
 
-         choice = scanner.nextInt();
+            if (choice > 0 && choice <= spells.size()) {
+                Spell selectedSpell = (Spell) spells.get(choice - 1);
 
-        // Check if the user's choice is valid
-        if (choice > 0 && choice <= spells.size()) {
-            Spell selectedSpell = (Spell) spells.get(choice - 1);
-            heroEvent.castSpell(target, selectedSpell, hero);
-        } else {
-            System.out.println("Invalid choice. No spell used.");
-        }}
+                if (hero.getMP() >= selectedSpell.getManaCost()) {
+                    heroEvent.castSpell(target, selectedSpell, hero);
+                } else {
+                    System.out.println("Insufficient mana to cast " + selectedSpell.getName() +
+                            ". Please select another action.");
+                    choice = 0;
+                }
+            } else {
+                System.out.println("Invalid choice. No spell used.");
+            }
+        } while (choice <= 0 || choice > spells.size());
     }
 
     private void usePotion(Hero hero) {
         List<Item> potions = new ArrayList<>();
         List<Item> inventory = hero.getItems();
 
-        // Gather all potions from hero's inventory
         for (Item item : inventory) {
             if (item.getType().equals(Type.POTION)) {
                 potions.add(item);
@@ -136,32 +223,28 @@ public class BattleEvent {
             return;
         }
 
-        // Display available potions for the user to choose
         int choice = 0;
-        while(choice == 0 || choice < 0 || choice > potions.size()){
-        System.out.println("Select a potion to use:");
-        for (int i = 0; i < potions.size(); i++) {
-            System.out.println((i + 1) + ". " + potions.get(i).getName());
-        }
+        while (choice == 0 || choice < 0 || choice > potions.size()) {
+            System.out.println("Select a potion to use:");
+            for (int i = 0; i < potions.size(); i++) {
+                System.out.println((i + 1) + ". " + potions.get(i).getName());
+            }
 
-         choice = scanner.nextInt();
+            choice = scanner.nextInt();
 
-        // Check if the user's choice is valid
-        if (choice > 0 && choice <= potions.size()) {
-            Item selectedPotion = potions.get(choice - 1);
-            heroEvent.usePotion(hero, selectedPotion, hero); // Apply the potion effect
-        } else {
-            System.out.println("Invalid choice. No potion used.");
-        }
+            if (choice > 0 && choice <= potions.size()) {
+                Item selectedPotion = potions.get(choice - 1);
+                heroEvent.usePotion(hero, selectedPotion, hero);
+            } else {
+                System.out.println("Invalid choice. No potion used.");
+            }
         }
     }
-
 
     private void useArmor(Hero hero) {
         List<Item> armors = new ArrayList<>();
         List<Item> inventory = hero.getItems();
 
-        // Gather all armors from hero's inventory
         for (Item item : inventory) {
             if (item.getType().equals(Type.ARMOR)) {
                 armors.add(item);
@@ -182,9 +265,8 @@ public class BattleEvent {
 
             choice = scanner.nextInt();
 
-            // Check if the user's choice is valid
             if (choice > 0 && choice <= armors.size()) {
-                Item selectedArmor =  armors.get(choice - 1);
+                Item selectedArmor = armors.get(choice - 1);
                 hero.equipArmor(selectedArmor);
                 System.out.println(hero.getName() + " has equipped " + selectedArmor.getName() + ".");
             } else {
@@ -197,7 +279,6 @@ public class BattleEvent {
         List<Item> weapons = new ArrayList<>();
         List<Item> inventory = hero.getItems();
 
-        // Gather all weapons from hero's inventory
         for (Item item : inventory) {
             if (item.getType().equals(Type.WEAPON)) {
                 weapons.add(item);
@@ -219,16 +300,13 @@ public class BattleEvent {
 
             choice = scanner.nextInt();
 
-            // Check if the user's choice is valid
             if (choice > 0 && choice <= weapons.size()) {
                 Item selectedWeapon = weapons.get(choice - 1);
-
-                // Prompt for hand selection (L or R)
                 System.out.println("Select hand to equip (L for left, R for right):");
                 hand = scanner.next().toUpperCase().charAt(0);
 
                 if (hand == 'L' || hand == 'R') {
-                    hero.equipWeapon(selectedWeapon, hand); // Equip weapon in specified hand
+                    hero.equipWeapon(selectedWeapon, hand);
                     System.out.println(hero.getName() + " has equipped " + selectedWeapon.getName() + " in the " + (hand == 'L' ? "left" : "right") + " hand.");
                 } else {
                     System.out.println("Invalid hand selection. Please enter 'L' for left or 'R' for right.");
@@ -238,10 +316,4 @@ public class BattleEvent {
             }
         }
     }
-
-
-
-
-
-
 }

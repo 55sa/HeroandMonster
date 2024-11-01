@@ -18,10 +18,6 @@ public class MarketEvent {
     private void buy(Market market, Team<Hero> heroTeam) {
         System.out.println("Available products for purchase:");
         List<Item> products = market.getProducts();
-        for (int i = 0; i < products.size(); i++) {
-            Item item = products.get(i);
-            System.out.println((i + 1) + ". " + item.getName() + " - Price: " + item.getPrice() + ", Level: " + item.getLevel());
-        }
         int choice = -1;
 
         while (choice != 0) {
@@ -53,6 +49,7 @@ public class MarketEvent {
                     if (selectedHero.getLevel() >= selectedItem.getLevel() && selectedHero.getGold() >= selectedItem.getPrice()) {
                         selectedHero.addItem(selectedItem); // Add item to hero's inventory
                         selectedHero.setGold(selectedHero.getGold() - selectedItem.getPrice()); // Deduct gold
+                        market.deleteItem(selectedItem); // Remove item from market inventory
                         System.out.println(selectedHero.getName() + " has purchased " + selectedItem.getName() + ".");
                     } else {
                         System.out.println("Cannot purchase. Either not enough gold or hero level is too low.");
@@ -72,7 +69,7 @@ public class MarketEvent {
     }
 
     // Method for selling an item from a specific hero in the team
-    private void sell(Team<Hero> heroTeam) {
+    private void sell(Market market, Team<Hero> heroTeam) {
         System.out.println("Select a hero to sell an item:");
         for (int i = 0; i < heroTeam.getTeams().size(); i++) {
             Hero hero = heroTeam.getTeams().get(i);
@@ -123,6 +120,7 @@ public class MarketEvent {
                 // Proceed with the sale
                 selectedHero.removeItem(selectedItem); // Remove item from inventory
                 selectedHero.setGold(selectedHero.getGold() + (selectedItem.getPrice() / 2)); // Add half of item price to hero's gold
+                market.addItem(selectedItem); // Add item back to market inventory
                 System.out.println(selectedHero.getName() + " has sold " + selectedItem.getName() + " for " + (selectedItem.getPrice() / 2) + " gold.");
             } else {
                 System.out.println("Sale canceled.");
@@ -151,7 +149,7 @@ public class MarketEvent {
                     buy(market, heroTeam);
                     break;
                 case 2:
-                    sell(heroTeam);
+                    sell(market, heroTeam);
                     break;
                 case 3:
                     shopping = false;

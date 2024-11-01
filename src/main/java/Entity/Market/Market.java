@@ -18,4 +18,16 @@ public class Market {
     public Market(List<Item> products) {
         this.products = products;
     }
+
+    public void addItem(Item item){
+        products.add(item);
+    }
+
+    public void deleteItem(Item item){
+        for(int i=0;i<products.size();i++){
+            if(item.getName().equals(products.get(i).getName())){
+                products.remove(i);
+            }
+        }
+    }
 }

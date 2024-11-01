@@ -11,7 +11,7 @@ public abstract class Monster {
     // Constants for default values
     private static final int BASE_HP = 100;
     private static final int BASE_DAMAGE = 20;
-    private static final int BASE_DEFENSE = 10;
+    private static final int BASE_DEFENSE = 1;
     private static final double BASE_DODGE_MULTIPLIER = 1;
 
     public Monster(String name, int level) {

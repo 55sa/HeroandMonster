@@ -45,7 +45,7 @@ public class HeroEventImp implements Event<Hero, Monster> {
         }
 
         if (!dodge(target)) {
-            target.reduceHealth((int) (damage * (1 - target.getDefense() / 100.0)));
+            target.reduceHealth((int) (Math.max(0,damage * (1 - target.getDefense() / 100.0))));
             System.out.println(hero.getName() + " attacked " + target.getName() + " for " + damage + " damage!");
         } else {
             System.out.println(target.getName() + " dodged the attack!");
@@ -87,7 +87,7 @@ public class HeroEventImp implements Event<Hero, Monster> {
         int baseDamage = (int) spell.getInfo().get("damage");
         int adjustedDamage = (int) (baseDamage + (hero.getDexterity() / 10000.0) * baseDamage);
         int damageAfterDefense = (int) (adjustedDamage * (1 - target.getDefense() / 100.0));
-
+        damageAfterDefense = Math.max(0, damageAfterDefense);
         if (!dodge(target)) {
             target.reduceHealth(damageAfterDefense);
             hero.reduceMana(manaCost);

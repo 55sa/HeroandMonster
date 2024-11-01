@@ -198,7 +198,7 @@ public abstract class Hero {
 
     public void revive(){
         HP = (int) (level * 100 * 0.5);
-        MP *= (int) (level * 50 * 0.5);
+        MP = (int) (level * 50 * 0.5);
 
     }
 

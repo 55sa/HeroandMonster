@@ -2,6 +2,7 @@ package Entity;
 
 import java.util.List;
 
+// Team class used for build up teams
 public class Team <T>{
     private List<T> teams;
 

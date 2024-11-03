@@ -4,6 +4,7 @@ import Entity.Items.Item;
 
 import java.util.List;
 
+// Market class
 public class Market {
     private List<Item> products;
 

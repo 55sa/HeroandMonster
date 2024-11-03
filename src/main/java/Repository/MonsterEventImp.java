@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+// implementation for monster's event
 public class MonsterEventImp implements Event<Monster, Hero> {
 
     private final Random random = new Random();

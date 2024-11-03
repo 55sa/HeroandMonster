@@ -2,7 +2,7 @@ package Entity.Board;
 // implementation of board cells
 
 
-
+// each cell of Board
 
 public class Boardcells {
     private int row;            // Row position of the cell

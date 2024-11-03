@@ -1,5 +1,5 @@
 package Entity.Human;
-
+//Hero type Sorcerer
 public class Sorcerer extends Hero {
 
 

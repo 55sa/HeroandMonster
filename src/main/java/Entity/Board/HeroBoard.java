@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-
+// Specific board for hero and monster
 public class HeroBoard extends Board {
 
     public HeroBoard(int n) {

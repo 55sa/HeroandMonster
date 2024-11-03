@@ -4,6 +4,7 @@ import Entity.Human.Hero;
 
 import java.util.Scanner;
 
+//tools for the whole program
 public class Utils {
     private static final Scanner scanner = new Scanner(System.in);
 

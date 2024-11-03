@@ -1,5 +1,6 @@
 package Entity.Monster;
 
+//Monster Class for contral all monster
 public abstract class Monster {
     private String name; // Monster's name
     private int level; // Monster's level

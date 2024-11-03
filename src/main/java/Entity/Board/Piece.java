@@ -1,5 +1,6 @@
 package Entity.Board;
 
+//Stuff that the cell represent Market Block Empty
 public class Piece {
     private Object event;
 

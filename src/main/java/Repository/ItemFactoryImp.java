@@ -5,6 +5,7 @@ import Entity.Items.*;
 
 import java.util.HashMap;
 
+//Item factory implementation
 public class ItemFactoryImp implements ItemFactory {
 
 

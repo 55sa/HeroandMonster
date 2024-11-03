@@ -1,5 +1,6 @@
 package Entity.Items;
 
+//Spell class
 public class Spell extends Item {
     private int damage;          // Damage value of the spell
     private int manaCost;        // Mana cost to cast the spell

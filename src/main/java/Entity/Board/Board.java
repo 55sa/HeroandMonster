@@ -1,6 +1,6 @@
 package Entity.Board;
 
-
+// The base board class
 public abstract class Board {
     protected int n; // Size of the board (n x n)
     protected Boardcells[][] board; // 2D array representing the board grid

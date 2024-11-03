@@ -11,7 +11,7 @@ import java.util.Random;
 
 import static Entity.Items.Spell.SpellType.*;
 
-
+//implementation for hero's event
 public class HeroEventImp implements Event<Hero, Monster> {
 
     private final Random random = new Random();

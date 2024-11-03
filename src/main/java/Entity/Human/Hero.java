@@ -7,7 +7,7 @@ import Entity.Items.Weapon;
 
 import java.util.ArrayList;
 import java.util.List;
-
+// Hero class used for represent general hero
 public abstract class Hero {
     protected String name;
     protected int level;
@@ -31,7 +31,7 @@ public abstract class Hero {
 
     public Hero(String name) {
         this.name = name;
-        this.level = 10;
+        this.level = 1;
         this.exp = 0;
         this.HP = level * 100; // Initialize HP based on level
         this.MP = level * 50;  // Initialize MP based on level

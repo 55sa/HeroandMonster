@@ -11,6 +11,7 @@ import Entity.Team;
 import java.util.List;
 import java.util.Scanner;
 
+//Market page of the game
 public class MarketEvent {
     private final Scanner scanner = new Scanner(System.in);
 

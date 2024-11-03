@@ -12,6 +12,7 @@ import Util.Utils;
 
 import java.util.*;
 
+//Main page of the game
 public class MainEvent {
     private HeroBoard heroBoard = new HeroBoard(8);
     private Event<Hero, Monster> heroEvent = new HeroEventImp();

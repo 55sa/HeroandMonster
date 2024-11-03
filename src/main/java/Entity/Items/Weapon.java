@@ -1,5 +1,6 @@
 package Entity.Items;
 
+//Weapon Class
 public class Weapon extends Item {
     private int damage;          // Base damage of the weapon
     private int handsRequired;   // Number of hands required to use the weapon

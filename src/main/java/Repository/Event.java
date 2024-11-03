@@ -7,7 +7,7 @@ import Entity.Team;
 
 import java.util.List;
 
-//event handler
+//event handler used for each character's event
 public interface Event<T,U> {
 
   public boolean win(Team<U> opposingTeam);

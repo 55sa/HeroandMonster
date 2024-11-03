@@ -9,7 +9,7 @@ import Entity.Items.Potion;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
+//Item database used to store in market
 public class Gamedatabase {
     // Static list to store all items
     public static final List<Item> ITEMS = new ArrayList<>();

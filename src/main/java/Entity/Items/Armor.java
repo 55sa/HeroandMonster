@@ -1,5 +1,6 @@
 package Entity.Items;
 
+//Armor class
 public class Armor extends Item {
     private int damageReduction;  // Damage reduction value of the armor
 

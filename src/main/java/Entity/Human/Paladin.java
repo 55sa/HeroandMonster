@@ -1,5 +1,5 @@
 package Entity.Human;
-
+// Hero type Paladin
 public class Paladin extends Hero {
 
     public Paladin(String name) {

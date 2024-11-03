@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+//Battle Page of the game
 public class BattleEvent {
 
     private CharacterFactory characterFactory = new CharacterFactoryImp();

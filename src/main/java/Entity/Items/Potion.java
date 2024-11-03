@@ -2,6 +2,7 @@ package Entity.Items;
 
 import Entity.Human.Hero;
 
+// Potion class
 public class Potion extends Item {
     private int effectAmount;    // The amount of increase for the specific stat
     private StatType statType;   // The stat affected by the potion

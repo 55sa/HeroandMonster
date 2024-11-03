@@ -3,6 +3,7 @@ package Entity.Human;
 import Entity.Items.Armor;
 import Entity.Items.Weapon;
 
+// Equipment class used to manage hero's weapon and armor
 public class Equipment {
     private Weapon leftHand;
     private Weapon rightHand;

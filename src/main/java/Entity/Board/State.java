@@ -1,8 +1,8 @@
 package Entity.Board;
 
-//pieces in cell implemention
 
 
+//cell state enum
 public enum State {
     INACCESSIBLE,  // Heroes cannot enter
     MARKET,        // Market space where heroes can buy or sell items

@@ -7,11 +7,8 @@ import Repository.*;
 
 import java.util.HashMap;
 
+// Main access
 public class Main {
-
-
-
-
 
 
 public static void main(String[] args){

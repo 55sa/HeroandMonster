@@ -1,5 +1,6 @@
 package Entity.Human;
 
+// warrior hero
 public class Warrior extends Hero {
 
 

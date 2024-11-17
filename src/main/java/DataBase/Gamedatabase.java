@@ -1,15 +1,11 @@
 package DataBase;
 
-import Entity.Items.Item;
-import Entity.Items.Armor;
-import Entity.Items.Spell;
-import Entity.Items.Weapon;
-import Entity.Items.Potion;
-
+import Entity.Items.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-//Item database used to store in market
+
+// Item database used to store in market
 public class Gamedatabase {
     // Static list to store all items
     public static final List<Item> ITEMS = new ArrayList<>();
@@ -17,9 +13,7 @@ public class Gamedatabase {
 
     static {
         initializeArmors();
-        initializeIceSpells();
-        initializeFireSpells();
-        initializeLightningSpells();
+        initializeSpells();
         initializeWeapons();
         initializePotions();
     }
@@ -36,37 +30,36 @@ public class Gamedatabase {
         }
     }
 
-    private static void initializeIceSpells() {
-        ITEMS.add(new Spell("Snow_Cannon", 500, 2, 650, 250, Spell.SpellType.ICE));
-        ITEMS.add(new Spell("Ice_Blade", 250, 1, 450, 100, Spell.SpellType.ICE));
-        ITEMS.add(new Spell("Frost_Blizzard", 750, 5, 850, 350, Spell.SpellType.ICE));
-        ITEMS.add(new Spell("Arctic_Storm", 700, 6, 800, 300, Spell.SpellType.ICE));
+    private static void initializeSpells() {
+        // Fire Spells
+        ITEMS.add(new FireSpell("Flame_Tornado", 700, 4, 850, 300));
+        ITEMS.add(new FireSpell("Breath_of_Fire", 350, 1, 450, 100));
+        ITEMS.add(new FireSpell("Heat_Wave", 450, 2, 600, 150));
+        ITEMS.add(new FireSpell("Lava_Comet", 800, 7, 1000, 550));
+        ITEMS.add(new FireSpell("Hell_Storm", 600, 3, 950, 600));
 
         for (int i = 0; i < 10; i++) {
-            ITEMS.add(new Spell("IceSpell_" + (i + 1), 200 + RANDOM.nextInt(800), RANDOM.nextInt(10) + 1, 300 + RANDOM.nextInt(700), 100 + RANDOM.nextInt(500), Spell.SpellType.ICE));
+            ITEMS.add(new FireSpell("FireSpell_" + (i + 1), 200 + RANDOM.nextInt(800), RANDOM.nextInt(10) + 1, 300 + RANDOM.nextInt(700), 100 + RANDOM.nextInt(500)));
         }
-    }
 
-    private static void initializeFireSpells() {
-        ITEMS.add(new Spell("Flame_Tornado", 700, 4, 850, 300, Spell.SpellType.FIRE));
-        ITEMS.add(new Spell("Breath_of_Fire", 350, 1, 450, 100, Spell.SpellType.FIRE));
-        ITEMS.add(new Spell("Heat_Wave", 450, 2, 600, 150, Spell.SpellType.FIRE));
-        ITEMS.add(new Spell("Lava_Comet", 800, 7, 1000, 550, Spell.SpellType.FIRE));
-        ITEMS.add(new Spell("Hell_Storm", 600, 3, 950, 600, Spell.SpellType.FIRE));
+        // Ice Spells
+        ITEMS.add(new IceSpell("Snow_Cannon", 500, 2, 650, 250));
+        ITEMS.add(new IceSpell("Ice_Blade", 250, 1, 450, 100));
+        ITEMS.add(new IceSpell("Frost_Blizzard", 750, 5, 850, 350));
+        ITEMS.add(new IceSpell("Arctic_Storm", 700, 6, 800, 300));
 
         for (int i = 0; i < 10; i++) {
-            ITEMS.add(new Spell("FireSpell_" + (i + 1), 200 + RANDOM.nextInt(800), RANDOM.nextInt(10) + 1, 300 + RANDOM.nextInt(700), 100 + RANDOM.nextInt(500), Spell.SpellType.FIRE));
+            ITEMS.add(new IceSpell("IceSpell_" + (i + 1), 200 + RANDOM.nextInt(800), RANDOM.nextInt(10) + 1, 300 + RANDOM.nextInt(700), 100 + RANDOM.nextInt(500)));
         }
-    }
 
-    private static void initializeLightningSpells() {
-        ITEMS.add(new Spell("Lightning_Dagger", 400, 1, 500, 150, Spell.SpellType.LIGHTNING));
-        ITEMS.add(new Spell("Thunder_Blast", 750, 4, 950, 400, Spell.SpellType.LIGHTNING));
-        ITEMS.add(new Spell("Electric_Arrows", 550, 5, 650, 200, Spell.SpellType.LIGHTNING));
-        ITEMS.add(new Spell("Spark_Needles", 500, 2, 600, 200, Spell.SpellType.LIGHTNING));
+        // Lightning Spells
+        ITEMS.add(new LightSpell("Lightning_Dagger", 400, 1, 500, 150));
+        ITEMS.add(new LightSpell("Thunder_Blast", 750, 4, 950, 400));
+        ITEMS.add(new LightSpell("Electric_Arrows", 550, 5, 650, 200));
+        ITEMS.add(new LightSpell("Spark_Needles", 500, 2, 600, 200));
 
         for (int i = 0; i < 10; i++) {
-            ITEMS.add(new Spell("LightningSpell_" + (i + 1), 200 + RANDOM.nextInt(800), RANDOM.nextInt(10) + 1, 300 + RANDOM.nextInt(700), 100 + RANDOM.nextInt(500), Spell.SpellType.LIGHTNING));
+            ITEMS.add(new LightSpell("LightningSpell_" + (i + 1), 200 + RANDOM.nextInt(800), RANDOM.nextInt(10) + 1, 300 + RANDOM.nextInt(700), 100 + RANDOM.nextInt(500)));
         }
     }
 
@@ -84,15 +77,32 @@ public class Gamedatabase {
     }
 
     private static void initializePotions() {
-        ITEMS.add(new Potion("Health Potion", 50, 1, 100, Potion.StatType.HP));
-        ITEMS.add(new Potion("Mana Potion", 40, 1, 100, Potion.StatType.MP));
-        ITEMS.add(new Potion("Strength Elixir", 60, 2, 10, Potion.StatType.STRENGTH));
-        ITEMS.add(new Potion("Dexterity Serum", 70, 2, 15, Potion.StatType.DEXTERITY));
-        ITEMS.add(new Potion("Agility Boost", 80, 3, 20, Potion.StatType.AGILITY));
+        ITEMS.add(new HpPotion("Health Potion", 50, 1, 100));
+        ITEMS.add(new MpPotion("Mana Potion", 40, 1, 100));
+        ITEMS.add(new StrengthPotion("Strength Elixir", 60, 2, 10));
+        ITEMS.add(new DexterityPotion("Dexterity Serum", 70, 2, 15));
+        ITEMS.add(new AgilityPotion("Agility Boost", 80, 3, 20));
 
         for (int i = 0; i < 10; i++) {
             Potion.StatType randomStatType = Potion.StatType.values()[RANDOM.nextInt(Potion.StatType.values().length)];
-            ITEMS.add(new Potion("Potion_" + (i + 1), 30 + RANDOM.nextInt(80), RANDOM.nextInt(10) + 1, 5 + RANDOM.nextInt(95), randomStatType));
+            switch (randomStatType) {
+                case HP:
+                    ITEMS.add(new HpPotion("Potion_HP_" + (i + 1), 30 + RANDOM.nextInt(80), RANDOM.nextInt(10) + 1, 5 + RANDOM.nextInt(95)));
+                    break;
+                case MP:
+                    ITEMS.add(new MpPotion("Potion_MP_" + (i + 1), 30 + RANDOM.nextInt(80), RANDOM.nextInt(10) + 1, 5 + RANDOM.nextInt(95)));
+                    break;
+                case STRENGTH:
+                    ITEMS.add(new StrengthPotion("Potion_Strength_" + (i + 1), 30 + RANDOM.nextInt(80), RANDOM.nextInt(10) + 1, 5 + RANDOM.nextInt(95)));
+                    break;
+                case DEXTERITY:
+                    ITEMS.add(new DexterityPotion("Potion_Dexterity_" + (i + 1), 30 + RANDOM.nextInt(80), RANDOM.nextInt(10) + 1, 5 + RANDOM.nextInt(95)));
+                    break;
+                case AGILITY:
+                    ITEMS.add(new AgilityPotion("Potion_Agility_" + (i + 1), 30 + RANDOM.nextInt(80), RANDOM.nextInt(10) + 1, 5 + RANDOM.nextInt(95)));
+                    break;
+            }
         }
     }
+
 }

@@ -31,7 +31,7 @@ public abstract class Hero {
 
     public Hero(String name) {
         this.name = name;
-        this.level = 1;
+        this.level = 8;
         this.exp = 0;
         this.HP = level * 100; // Initialize HP based on level
         this.MP = level * 50;  // Initialize MP based on level

@@ -3,16 +3,14 @@ package Entity.Items;
 import Entity.Human.Hero;
 
 // Potion class
-public class Potion extends Item {
+public abstract class Potion extends Item {
     private int effectAmount;    // The amount of increase for the specific stat
-    private StatType statType;   // The stat affected by the potion
+    protected StatType statType;   // The stat affected by the potion
 
-    public Potion(String name, int price, int level, int effectAmount, StatType statType) {
+    public Potion(String name, int price, int level, int effectAmount) {
         super(name, price, level, Type.POTION);
         this.effectAmount = effectAmount;
-        this.statType = statType;
         info.put("effectAmount", effectAmount);
-        info.put("statType", statType);
     }
 
     // Enum to define potion types

@@ -25,7 +25,7 @@ public class Gamedatabase {
         ITEMS.add(new Armor("Wizard_Shield", 1200, 10, 1500));
         ITEMS.add(new Armor("Guardian_Angel", 1000, 10, 1000));
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 20; i++) {
             ITEMS.add(new Armor("Armor_" + (i + 1), 100 + RANDOM.nextInt(900), RANDOM.nextInt(10) + 1, 150 + RANDOM.nextInt(1500)));
         }
     }
@@ -38,7 +38,7 @@ public class Gamedatabase {
         ITEMS.add(new FireSpell("Lava_Comet", 800, 7, 1000, 550));
         ITEMS.add(new FireSpell("Hell_Storm", 600, 3, 950, 600));
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 20; i++) {
             ITEMS.add(new FireSpell("FireSpell_" + (i + 1), 200 + RANDOM.nextInt(800), RANDOM.nextInt(10) + 1, 300 + RANDOM.nextInt(700), 100 + RANDOM.nextInt(500)));
         }
 
@@ -48,7 +48,7 @@ public class Gamedatabase {
         ITEMS.add(new IceSpell("Frost_Blizzard", 750, 5, 850, 350));
         ITEMS.add(new IceSpell("Arctic_Storm", 700, 6, 800, 300));
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 20; i++) {
             ITEMS.add(new IceSpell("IceSpell_" + (i + 1), 200 + RANDOM.nextInt(800), RANDOM.nextInt(10) + 1, 300 + RANDOM.nextInt(700), 100 + RANDOM.nextInt(500)));
         }
 
@@ -58,7 +58,7 @@ public class Gamedatabase {
         ITEMS.add(new LightSpell("Electric_Arrows", 550, 5, 650, 200));
         ITEMS.add(new LightSpell("Spark_Needles", 500, 2, 600, 200));
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 20; i++) {
             ITEMS.add(new LightSpell("LightningSpell_" + (i + 1), 200 + RANDOM.nextInt(800), RANDOM.nextInt(10) + 1, 300 + RANDOM.nextInt(700), 100 + RANDOM.nextInt(500)));
         }
     }
@@ -71,7 +71,7 @@ public class Gamedatabase {
         ITEMS.add(new Weapon("TSwords", 1400, 8, 1600, 2));
         ITEMS.add(new Weapon("Dagger", 200, 1, 250, 1));
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 20; i++) {
             ITEMS.add(new Weapon("Weapon_" + (i + 1), 100 + RANDOM.nextInt(1300), RANDOM.nextInt(10) + 1, 200 + RANDOM.nextInt(1500), 1 + RANDOM.nextInt(2)));
         }
     }
@@ -83,7 +83,7 @@ public class Gamedatabase {
         ITEMS.add(new DexterityPotion("Dexterity Serum", 70, 2, 15));
         ITEMS.add(new AgilityPotion("Agility Boost", 80, 3, 20));
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 20; i++) {
             Potion.StatType randomStatType = Potion.StatType.values()[RANDOM.nextInt(Potion.StatType.values().length)];
             switch (randomStatType) {
                 case HP:

@@ -60,11 +60,6 @@ public class HeroBoard extends Board {
                     Market market = new Market(marketItems);
                     board[i][j].setPiece(new Piece(market));
 
-//                     Debugging check
-//                    System.out.println("Market created at (" + i + ", " + j + ") with items:");
-//                    for (Item item : marketItems) {
-//                        System.out.println(" - " + item.getName());
-//                    }
                 }
             }
         }

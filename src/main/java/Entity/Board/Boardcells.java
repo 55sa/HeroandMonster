@@ -4,12 +4,24 @@ package Entity.Board;
 
 // each cell of Board
 
+import Entity.Market.Market;
+
 public class Boardcells {
     private int row;            // Row position of the cell
     private int col;            // Column position of the cell
     private State state;        // Type of state in the cell
 
     private Piece piece;
+
+    private Market market;
+
+    public Market getMarket() {
+        return market;
+    }
+
+    public void setMarket(Market market) {
+        this.market = market;
+    }
 
     public State getState() {
         return state;

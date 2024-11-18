@@ -1,8 +1,14 @@
 package Entity.Board;
 
+import DataBase.Gamedatabase;
 import Entity.Human.Hero;
+import Entity.Items.Item;
+import Entity.Market.Market;
 import Entity.Monster.Monster;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 // Specific board for Legends of Valor
@@ -13,8 +19,13 @@ public class LegendBoard extends Board {
         initializeBoard();
     }
 
+
     @Override
     protected void initializeBoard() {
+        List<Item> allItems = new ArrayList<>(Gamedatabase.ITEMS);
+        Collections.shuffle(allItems);
+        int itemIndex = 0;
+
         for (int row = 0; row < n; row++) {
             for (int col = 0; col < n; col++) {
                 if (row == 0 || row == n - 1) {
@@ -22,8 +33,16 @@ public class LegendBoard extends Board {
                     if (col == 2 || col == 5) {
                         board[row][col] = new Boardcells(row, col, State.INACCESSIBLE, null);
                     } else {
+                        List<Item> marketItems = new ArrayList<>();
+                        for (int k = 0; k < Math.min(5, allItems.size() - itemIndex); k++) {
+                            marketItems.add(allItems.get(itemIndex++));
+                        }
+
                         Piece piece = new Piece(new HeroAndMonsterContainer());
                         board[row][col] = new Boardcells(row, col, State.NEXUS, piece);
+                        Market market = new Market(marketItems);
+                        board[row][col].setMarket(market);
+
                     }
                 } else if (col == 2 || col == 5) {
                     // Walls separating the lanes

@@ -6,7 +6,9 @@ import Entity.Monster.Monster;
 import Entity.Team;
 import Util.Utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class LegendsOfValor implements Game{
     private Team<Hero> heroTeam = new Team<>();
@@ -19,9 +21,21 @@ public class LegendsOfValor implements Game{
 
    private boolean endTurn = false;
 
+   private boolean heroWin = false;
+
    private HashMap<String, int[]> HeroBasePostion = new HashMap<>();
 
    private HashMap<String, int[]> MonsterBasePostion = new HashMap<>();
+
+   private List<Monster> MonsterLivePool =new ArrayList<>();
+
+   private List<Hero> HeroLivePool =new ArrayList<>();
+
+   private HashMap<String, Integer> HeroDeadPool =new HashMap<>();
+
+   private HashMap<String, Integer> MonsterDeadPool =new HashMap<>();
+
+
 
 
     // Helper method to calculate column based on lane
@@ -48,6 +62,7 @@ public class LegendsOfValor implements Game{
         // Initialize Hero Base Positions
         for (int i = 0; i < heroTeam.getTeams().size(); i++) {
             Hero hero = heroTeam.getTeams().get(i);
+            HeroLivePool.add(hero);
 
             // Distribute heroes evenly across the first row of each lane
             int heroRow = 7; // Heroes start at the bottom row
@@ -70,6 +85,7 @@ public class LegendsOfValor implements Game{
         // Initialize Monster Base Positions
         for (int i = 0; i < monsterTeam.getTeams().size(); i++) {
             Monster monster = monsterTeam.getTeams().get(i);
+            MonsterLivePool.add(monster);
 
             // Distribute monsters evenly across the last row of each lane
             int monsterRow = 0; // Monsters start at the top row
@@ -115,6 +131,21 @@ public class LegendsOfValor implements Game{
         // Update the hero's position on the board
         updateHeroPosition(newRow, newCol, hero);
 
+        State curState = board.getCell(newRow, newCol).getState();
+
+        if(curState == State.BUSH){
+
+        }
+        else if(curState == State.CAVE){
+
+        }
+        else if(curState == State.Koulou){
+
+        }
+
+        if (newRow == 0){
+            heroWin = true;
+        }
 
     }
 
@@ -269,10 +300,48 @@ public class LegendsOfValor implements Game{
             // If the move is valid, exit the loop
             if (isValidMove(newRow, newCol, hero)) {
                 endTurn = true;
+
                 break;
             }
         }
     }
+
+    private List<Monster> getNeighborMonsters(int row, int col) {
+        List<Monster> res = new ArrayList<>();
+
+        // Define the four possible directions (north, west, south, east)
+        int[][] directions = {
+                {-1, 0}, // North
+                {1, 0},  // South
+                {0, -1}, // West
+                {0, 1}   // East
+        };
+
+        for (int[] dir : directions) {
+            int newRow = row + dir[0];
+            int newCol = col + dir[1];
+
+            // Check if the neighboring cell is within bounds
+            if (board.isWithinBounds(newRow, newCol)) {
+                Boardcells cell = board.getCell(newRow, newCol);
+
+                // Ensure the cell is not inaccessible
+                if (cell.getState() != State.INACCESSIBLE) {
+                    HeroAndMonsterContainer piece = (HeroAndMonsterContainer) cell.getPiece().getEvent();
+                    if (piece != null && piece.getMonster() != null) {
+                        res.add(piece.getMonster());
+                    }
+                }
+            }
+        }
+
+        return res;
+    }
+
+    private void MonsterBehavior(){
+
+    }
+
 
 
 }

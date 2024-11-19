@@ -1,5 +1,6 @@
 package Entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // Team class used for build up teams
@@ -14,7 +15,7 @@ public class Team <T>{
     }
 
     public void addMember(T member){
-
+        teams =new ArrayList<>();
         teams.add(member);
 
     }

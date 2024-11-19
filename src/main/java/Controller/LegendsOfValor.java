@@ -4,6 +4,9 @@ import Entity.Board.*;
 import Entity.Human.Hero;
 import Entity.Monster.Monster;
 import Entity.Team;
+import Repository.Event;
+import Repository.HeroEventImp;
+import Repository.MonsterEventImp;
 import Util.Utils;
 
 import java.util.ArrayList;
@@ -11,6 +14,10 @@ import java.util.HashMap;
 import java.util.List;
 
 public class LegendsOfValor implements Game{
+
+    Event heroEvent =new HeroEventImp();
+
+    Event monsterEvent = new MonsterEventImp();
     private Team<Hero> heroTeam = new Team<>();
 
     private Team<Monster> monsterTeam =new Team<>();
@@ -90,7 +97,8 @@ public class LegendsOfValor implements Game{
             // Distribute monsters evenly across the last row of each lane
             int monsterRow = 0; // Monsters start at the top row
             int monsterCol = getLaneCol(i); // Ensure monsters are placed in different lanes
-
+            monster.setRow(monsterRow);
+            monster.setCol(monsterCol);
 
             // Store monster's base position in MonsterBasePostion
             MonsterBasePostion.put(monster.getName(), new int[]{monsterRow, monsterCol});
@@ -103,6 +111,10 @@ public class LegendsOfValor implements Game{
 
         // Display initial board setup
         board.print();
+
+        for (int i=0; i<HeroLivePool.size();i++){
+
+        }
     }
 
 
@@ -134,12 +146,14 @@ public class LegendsOfValor implements Game{
         State curState = board.getCell(newRow, newCol).getState();
 
         if(curState == State.BUSH){
-
+            hero.setDexterity((int) (hero.getDexterity() * 0.1+ hero.getDexterity()));
         }
         else if(curState == State.CAVE){
+            hero.setAgility((int) (hero.getAgility() * 1.1));
 
         }
         else if(curState == State.Koulou){
+            hero.setStrength((int) (hero.getStrength() * 1.1));
 
         }
 
@@ -341,6 +355,56 @@ public class LegendsOfValor implements Game{
     private void MonsterBehavior(){
 
     }
+
+    private void attack(Hero hero) {
+        List<Monster> nearbyMonsters = getNeighborMonsters(hero.getRow(), hero.getCol());
+        if (nearbyMonsters.isEmpty()) {
+            System.out.println("No monsters nearby to attack.");
+            return;
+        }
+
+        System.out.println("Choose a monster to attack:");
+        for (int i = 0; i < nearbyMonsters.size(); i++) {
+            System.out.println((i + 1) + ". " + nearbyMonsters.get(i).getName());
+        }
+
+        int choice = Utils.getIntInRange("Enter monster number: ", 1, nearbyMonsters.size());
+        Monster target = nearbyMonsters.get(choice - 1);
+
+        heroEvent.attack(target,hero);
+
+
+        if (!target.isAlive()) {
+            System.out.println(target.getName() + " is defeated!");
+            removeMonster(target);
+        }
+    }
+
+
+    private void recallToNexus(Hero hero) {
+        int[] basePos = HeroBasePostion.get(hero.getName());
+        updateHeroPosition(basePos[0], basePos[1], hero);
+        System.out.println(hero.getName() + " has recalled to their Nexus.");
+    }
+
+    private void removeMonster(Monster monster) {
+        MonsterLivePool.remove(monster);
+        MonsterDeadPool.put(monster.getName(), 6);
+        HeroAndMonsterContainer container =
+                (HeroAndMonsterContainer) board.getCell(monster.getRow(), monster.getCol()).getPiece().getEvent();
+        container.setMonster(null);
+    }
+
+    private void removeHero(Hero hero) {
+        HeroLivePool.remove(hero);
+        HeroDeadPool.put(hero.getName(), 6);
+        HeroAndMonsterContainer container =
+                (HeroAndMonsterContainer) board.getCell(hero.getRow(), hero.getCol()).getPiece().getEvent();
+        container.setHero(null);
+    }
+
+
+
 
 
 

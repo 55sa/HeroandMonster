@@ -15,6 +15,34 @@ public abstract class Monster {
     private static final int BASE_DEFENSE = 1;
     private static final double BASE_DODGE_MULTIPLIER = 1;
 
+    private int row;
+
+    private int col;
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public int getRow() {
+        return row;
+    }
+
+    public void setRow(int row) {
+        this.row = row;
+    }
+
+    public int getCol() {
+        return col;
+    }
+
+    public void setCol(int col) {
+        this.col = col;
+    }
+
     public Monster(String name, int level) {
         this.name = name;
         this.level = level;

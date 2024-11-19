@@ -6,6 +6,8 @@ import Entity.Monster.Monster;
 import Entity.Team;
 import Util.Utils;
 
+import java.util.HashMap;
+
 public class LegendsOfValor implements Game{
     private Team<Hero> heroTeam = new Team<>();
 
@@ -15,6 +17,25 @@ public class LegendsOfValor implements Game{
 
    private Board board = new LegendBoard();
 
+   private boolean endTurn = false;
+
+   private HashMap<String, int[]> HeroBasePostion = new HashMap<>();
+
+   private HashMap<String, int[]> MonsterBasePostion = new HashMap<>();
+
+
+    // Helper method to calculate column based on lane
+    private int getLaneCol(int index) {
+        if (index == 0) {
+            return 0; // Top lane
+        } else if (index == 1) {
+            return 3; // Mid lane
+        } else if (index == 2) {
+            return 6; // Bottom lane
+        } else {
+            throw new IllegalArgumentException("Invalid index for lane calculation: " + index);
+        }
+    }
 
 
     @Override
@@ -24,12 +45,50 @@ public class LegendsOfValor implements Game{
         // Step 1: Create hero team
         heroTeam = Utils.createHeroes();
 
+        // Initialize Hero Base Positions
+        for (int i = 0; i < heroTeam.getTeams().size(); i++) {
+            Hero hero = heroTeam.getTeams().get(i);
+
+            // Distribute heroes evenly across the first row of each lane
+            int heroRow = 7; // Heroes start at the bottom row
+            int heroCol = getLaneCol(i);; // Ensure heroes are placed in different lanes
+            hero.setRow(heroRow);
+            hero.setCol(heroCol);
+
+            // Store hero's base position in HeroBasePostion
+            HeroBasePostion.put(hero.getName(), new int[]{heroRow, heroCol});
+
+            // Set hero into the board's HeroAndMonsterContainer
+            HeroAndMonsterContainer container =
+                    (HeroAndMonsterContainer) board.getCell(heroRow, heroCol).getPiece().getEvent();
+            container.setHero(hero);
+        }
+
+        // Step 2: Create monster team
         monsterTeam = Utils.createMonsterTeam(heroTeam);
 
-        // Step 2: Place heroes on the board and display the initial setup
+        // Initialize Monster Base Positions
+        for (int i = 0; i < monsterTeam.getTeams().size(); i++) {
+            Monster monster = monsterTeam.getTeams().get(i);
+
+            // Distribute monsters evenly across the last row of each lane
+            int monsterRow = 0; // Monsters start at the top row
+            int monsterCol = getLaneCol(i); // Ensure monsters are placed in different lanes
 
 
+            // Store monster's base position in MonsterBasePostion
+            MonsterBasePostion.put(monster.getName(), new int[]{monsterRow, monsterCol});
+
+            // Set monster into the board's HeroAndMonsterContainer
+            HeroAndMonsterContainer container =
+                    (HeroAndMonsterContainer) board.getCell(monsterRow, monsterCol).getPiece().getEvent();
+            container.setMonster(monster);
+        }
+
+        // Display initial board setup
+        board.print();
     }
+
 
     @Override
     public void displayInstructions() {
@@ -56,24 +115,7 @@ public class LegendsOfValor implements Game{
         // Update the hero's position on the board
         updateHeroPosition(newRow, newCol, hero);
 
-        // Handle encounters in the new position
-        HeroAndMonsterContainer container =
-                (HeroAndMonsterContainer) board.getCell(newRow, newCol).getPiece().getEvent();
 
-        if (container != null && container.getMonster() != null) {
-            System.out.println("Encounter! A monster is in this space.");
-            // Add battle logic here
-            HeroAndMonsterContainer heroContainer =
-                    (HeroAndMonsterContainer) board.getCell(newRow, newCol).getPiece().getEvent();
-            Hero battleHero = heroContainer.getHero();
-            Monster battleMonster = heroContainer.getMonster();
-
-            if (battleHero != null && battleMonster != null) {
-
-            }
-        } else {
-            System.out.println("No monsters in this space. You can proceed.");
-        }
     }
 
     /**
@@ -226,6 +268,7 @@ public class LegendsOfValor implements Game{
 
             // If the move is valid, exit the loop
             if (isValidMove(newRow, newCol, hero)) {
+                endTurn = true;
                 break;
             }
         }

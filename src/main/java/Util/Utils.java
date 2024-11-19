@@ -91,7 +91,7 @@ public class Utils {
         while (createdHeroes < numHeroes) {
             System.out.println("Creating Hero " + (createdHeroes + 1));
             System.out.print("Enter hero name: ");
-            String name = scanner.next();
+            String name = scanner.nextLine().trim();
 
             // Validate class type
             String classType = Utils.getStringFromOptions(
@@ -122,7 +122,7 @@ public class Utils {
 
         for (int i = 0; i < heroTeam.getTeams().size(); i++) {
             String monsterType = monsterTypes[random.nextInt(monsterTypes.length)];
-            String monsterName = monsterType + (i + 1); // Name monsters for uniqueness
+            String monsterName = "M" + (i + 1); // Name monsters for uniqueness
             Monster monster = characterFactory.createMonster(monsterType, monsterName, highestHeroLevel);
             if (monster != null) {
                 monsters.add(monster);

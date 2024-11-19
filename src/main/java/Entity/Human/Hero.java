@@ -21,6 +21,26 @@ public abstract class Hero {
     protected Equipment equipment;
     private List<Item> items;
 
+    protected int row;
+
+    protected int col;
+
+    public int getRow() {
+        return row;
+    }
+
+    public void setRow(int row) {
+        this.row = row;
+    }
+
+    public int getCol() {
+        return col;
+    }
+
+    public void setCol(int col) {
+        this.col = col;
+    }
+
     public int getExp() {
         return exp;
     }

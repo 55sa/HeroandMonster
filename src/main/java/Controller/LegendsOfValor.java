@@ -30,6 +30,8 @@ public class LegendsOfValor implements Game{
 
    private boolean heroWin = false;
 
+   private boolean monsterWin = false;
+
    private HashMap<String, int[]> HeroBasePostion = new HashMap<>();
 
    private HashMap<String, int[]> MonsterBasePostion = new HashMap<>();
@@ -59,61 +61,84 @@ public class LegendsOfValor implements Game{
     }
 
 
-    @Override
     public void Start() {
         System.out.println("Welcome to Legends Of Valor!");
 
         // Step 1: Create hero team
         heroTeam = Utils.createHeroes();
-
-        // Initialize Hero Base Positions
-        for (int i = 0; i < heroTeam.getTeams().size(); i++) {
-            Hero hero = heroTeam.getTeams().get(i);
-            HeroLivePool.add(hero);
-
-            // Distribute heroes evenly across the first row of each lane
-            int heroRow = 7; // Heroes start at the bottom row
-            int heroCol = getLaneCol(i);; // Ensure heroes are placed in different lanes
-            hero.setRow(heroRow);
-            hero.setCol(heroCol);
-
-            // Store hero's base position in HeroBasePostion
-            HeroBasePostion.put(hero.getName(), new int[]{heroRow, heroCol});
-
-            // Set hero into the board's HeroAndMonsterContainer
-            HeroAndMonsterContainer container =
-                    (HeroAndMonsterContainer) board.getCell(heroRow, heroCol).getPiece().getEvent();
-            container.setHero(hero);
-        }
+        initializeHeroPositions();
 
         // Step 2: Create monster team
         monsterTeam = Utils.createMonsterTeam(heroTeam);
-
-        // Initialize Monster Base Positions
-        for (int i = 0; i < monsterTeam.getTeams().size(); i++) {
-            Monster monster = monsterTeam.getTeams().get(i);
-            MonsterLivePool.add(monster);
-
-            // Distribute monsters evenly across the last row of each lane
-            int monsterRow = 0; // Monsters start at the top row
-            int monsterCol = getLaneCol(i); // Ensure monsters are placed in different lanes
-            monster.setRow(monsterRow);
-            monster.setCol(monsterCol);
-
-            // Store monster's base position in MonsterBasePostion
-            MonsterBasePostion.put(monster.getName(), new int[]{monsterRow, monsterCol});
-
-            // Set monster into the board's HeroAndMonsterContainer
-            HeroAndMonsterContainer container =
-                    (HeroAndMonsterContainer) board.getCell(monsterRow, monsterCol).getPiece().getEvent();
-            container.setMonster(monster);
-        }
+        initializeMonsterPositions();
 
         // Display initial board setup
         board.print();
 
-        for (int i=0; i<HeroLivePool.size();i++){
+        // Main game loop
+        while (!heroWin && !monsterWin) {
+            for (Hero hero : HeroLivePool) {
+                System.out.println("\nIt's " + hero.getName() + "'s turn.");
+                heroTurn(hero);
+                if (heroWin) {
+                    System.out.println("Heroes have reached the monsters' Nexus! Heroes win!");
+                    return; // End the game
+                }
+            }
 
+            for (Monster monster : MonsterLivePool) {
+                System.out.println("\nIt's " + monster.getName() + "'s turn.");
+                monsterBehavior(monster);
+                if (monsterWin) {
+                    System.out.println("Monsters have reached the heroes' Nexus! Monsters win!");
+                    return; // End the game
+                }
+            }
+
+            // Optionally update the board after each round
+            board.print();
+        }
+    }
+
+    // Initialize hero positions on the board
+    private void initializeHeroPositions() {
+        for (int i = 0; i < heroTeam.getTeams().size(); i++) {
+            Hero hero = heroTeam.getTeams().get(i);
+            HeroLivePool.add(hero);
+
+            int heroRow = 7; // Heroes start at the bottom row
+            int heroCol = getLaneCol(i); // Distribute heroes across lanes
+            hero.setRow(heroRow);
+            hero.setCol(heroCol);
+
+            // Store hero's base position
+            HeroBasePostion.put(hero.getName(), new int[]{heroRow, heroCol});
+
+            // Place hero on the board
+            HeroAndMonsterContainer container =
+                    (HeroAndMonsterContainer) board.getCell(heroRow, heroCol).getPiece().getEvent();
+            container.setHero(hero);
+        }
+    }
+
+    // Initialize monster positions on the board
+    private void initializeMonsterPositions() {
+        for (int i = 0; i < monsterTeam.getTeams().size(); i++) {
+            Monster monster = monsterTeam.getTeams().get(i);
+            MonsterLivePool.add(monster);
+
+            int monsterRow = 0; // Monsters start at the top row
+            int monsterCol = getLaneCol(i); // Distribute monsters across lanes
+            monster.setRow(monsterRow);
+            monster.setCol(monsterCol);
+
+            // Store monster's base position
+            MonsterBasePostion.put(monster.getName(), new int[]{monsterRow, monsterCol});
+
+            // Place monster on the board
+            HeroAndMonsterContainer container =
+                    (HeroAndMonsterContainer) board.getCell(monsterRow, monsterCol).getPiece().getEvent();
+            container.setMonster(monster);
         }
     }
 
@@ -352,9 +377,84 @@ public class LegendsOfValor implements Game{
         return res;
     }
 
-    private void MonsterBehavior(){
+    private void monsterBehavior(Monster monster) {
+        // Get the current position of the monster
+        int currentRow = monster.getRow();
+        int currentCol = monster.getCol();
 
+        // Check for nearby heroes
+        List<Hero> nearbyHeroes = getNeighborHeroes(currentRow, currentCol);
+        if (!nearbyHeroes.isEmpty()) {
+            // If heroes are nearby, attack the first one
+            Hero target = nearbyHeroes.get(0);
+            System.out.println(monster.getName() + " attacks " + target.getName() + "!");
+            monsterEvent.attack(target, monster);
+
+            // Check if the hero is defeated
+            if (!target.isAlive()) {
+                System.out.println(target.getName() + " is defeated!");
+                removeHero(target);
+            }
+            return; // End the monster's turn after attacking
+        }
+
+        // If no heroes are nearby, move forward
+        int newRow = currentRow + 1; // Monsters move south (toward the heroes' Nexus)
+        if (board.isWithinBounds(newRow, currentCol) && board.getCell(newRow, currentCol).getState() != State.INACCESSIBLE) {
+            // Ensure the next cell is not occupied by another monster
+            HeroAndMonsterContainer container = (HeroAndMonsterContainer) board.getCell(newRow, currentCol).getPiece().getEvent();
+            if (container == null || container.getMonster() == null) {
+                System.out.println(monster.getName() + " moves forward.");
+                updateMonsterPosition(newRow, currentCol, monster);
+
+                // Check if the monster reached the last row (heroes' Nexus)
+                if (newRow == 7) {
+                    System.out.println(monster.getName() + " has reached the heroes' Nexus! Monsters win!");
+                    monsterWin = true; // Flag the game as over
+                }
+            } else {
+                System.out.println(monster.getName() + " cannot move forward as the path is blocked.");
+            }
+        } else {
+            System.out.println(monster.getName() + " cannot move forward due to an obstacle.");
+        }
     }
+
+    // Handle a hero's turn
+    private void heroTurn(Hero hero) {
+        while (!endTurn) {
+            displayInstructions();
+            int choice = Utils.getIntInRange("Choose an action (1-7): ", 1, 7);
+            switch (choice) {
+                case 1:
+                    // Change Weapon or Armor
+                    break;
+                case 2:
+                    // Use a Potion
+                    break;
+                case 3:
+                    attack(hero);
+                    break;
+                case 4:
+                    // Cast a Spell
+                    break;
+                case 5:
+                    move(hero);
+                    break;
+                case 6:
+                    // Teleport
+                    break;
+                case 7:
+                    recallToNexus(hero);
+                    break;
+                default:
+                    System.out.println("Invalid choice. Try again.");
+            }
+        }
+        endTurn = false; // Reset for the next hero
+    }
+
+
 
     private void attack(Hero hero) {
         List<Monster> nearbyMonsters = getNeighborMonsters(hero.getRow(), hero.getCol());
@@ -401,6 +501,54 @@ public class LegendsOfValor implements Game{
         HeroAndMonsterContainer container =
                 (HeroAndMonsterContainer) board.getCell(hero.getRow(), hero.getCol()).getPiece().getEvent();
         container.setHero(null);
+    }
+
+
+
+    private List<Hero> getNeighborHeroes(int row, int col) {
+        List<Hero> heroes = new ArrayList<>();
+        int[][] directions = {
+                {-1, 0}, // North
+                {1, 0},  // South
+                {0, -1}, // West
+                {0, 1}   // East
+        };
+
+        for (int[] dir : directions) {
+            int newRow = row + dir[0];
+            int newCol = col + dir[1];
+            if (board.isWithinBounds(newRow, newCol)) {
+                HeroAndMonsterContainer container = (HeroAndMonsterContainer) board.getCell(newRow, newCol).getPiece().getEvent();
+                if (container != null && container.getHero() != null) {
+                    heroes.add(container.getHero());
+                }
+            }
+        }
+        return heroes;
+    }
+
+    private void updateMonsterPosition(int newRow, int newCol, Monster monster) {
+        // Get the current position of the monster
+        int curRow = monster.getRow();
+        int curCol = monster.getCol();
+
+        // Remove the monster from the current cell
+        HeroAndMonsterContainer oldContainer =
+                (HeroAndMonsterContainer) board.getCell(curRow, curCol).getPiece().getEvent();
+        if (oldContainer != null) {
+            oldContainer.setMonster(null);
+        }
+
+        // Update the monster's position
+        monster.setRow(newRow);
+        monster.setCol(newCol);
+
+        // Add the monster to the new cell
+        HeroAndMonsterContainer newContainer =
+                (HeroAndMonsterContainer) board.getCell(newRow, newCol).getPiece().getEvent();
+        if (newContainer != null) {
+            newContainer.setMonster(monster);
+        }
     }
 
 

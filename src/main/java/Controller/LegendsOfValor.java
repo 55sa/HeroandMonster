@@ -235,9 +235,16 @@ public class LegendsOfValor implements Game{
             return false; // Out of bounds, no hero
         }
 
+        Boardcells cell = board.getCell(row, col);
+        if (cell == null || cell.getPiece() == null) {
+            return false;
+        }
+
         // Retrieve the container at the cell
         HeroAndMonsterContainer container =
                 (HeroAndMonsterContainer) board.getCell(row, col).getPiece().getEvent();
+
+
 
         // Check if a hero exists in the container
         return container != null && container.getHero() != null;
@@ -600,15 +607,21 @@ public class LegendsOfValor implements Game{
         for (int[] dir : directions) {
             int newRow = row + dir[0];
             int newCol = col + dir[1];
+            // Check bounds
             if (board.isWithinBounds(newRow, newCol)) {
-                HeroAndMonsterContainer container = (HeroAndMonsterContainer) board.getCell(newRow, newCol).getPiece().getEvent();
-                if (container != null && container.getHero() != null) {
-                    heroes.add(container.getHero());
+                Boardcells cell = board.getCell(newRow, newCol);
+                if (cell != null && cell.getPiece() != null) {
+                    HeroAndMonsterContainer container =
+                            (HeroAndMonsterContainer) cell.getPiece().getEvent();
+                    if (container != null && container.getHero() != null) {
+                        heroes.add(container.getHero());
+                    }
                 }
             }
         }
         return heroes;
     }
+
 
     private void updateMonsterPosition(int newRow, int newCol, Monster monster) {
         // Get the current position of the monster

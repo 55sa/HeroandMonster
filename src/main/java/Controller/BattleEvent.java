@@ -148,7 +148,7 @@ public class BattleEvent {
         System.out.println("Equipped Armor: " + (hero.getEquipment().getArmor() != null ? hero.getEquipment().getArmor().getName() : "None"));
     }
 
-    private boolean useSpell(Hero hero, Monster target) {
+    public boolean useSpell(Hero hero, Monster target) {
         List<Item> spells = new ArrayList<>();
         for (Item item : hero.getItems()) {
             if (item.getType().equals(Type.SPELL)) {
@@ -187,7 +187,7 @@ public class BattleEvent {
         return false;
     }
 
-    private boolean usePotion(Hero hero) {
+    public boolean usePotion(Hero hero) {
         List<Item> potions = new ArrayList<>();
         for (Item item : hero.getItems()) {
             if (item.getType().equals(Type.POTION)) {
@@ -220,7 +220,7 @@ public class BattleEvent {
         } while (choice != 0);
     }
 
-    private boolean useArmor(Hero hero) {
+    public boolean useArmor(Hero hero) {
         List<Item> armors = new ArrayList<>();
         for (Item item : hero.getItems()) {
             if (item.getType().equals(Type.ARMOR)) {
@@ -254,7 +254,7 @@ public class BattleEvent {
         } while (choice != 0);
     }
 
-    private boolean useWeapon(Hero hero) {
+    public boolean useWeapon(Hero hero) {
         List<Item> weapons = new ArrayList<>();
         for (Item item : hero.getItems()) {
             if (item.getType().equals(Type.WEAPON)) {

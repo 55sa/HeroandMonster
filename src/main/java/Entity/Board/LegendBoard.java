@@ -38,7 +38,7 @@ public class LegendBoard extends Board {
                             marketItems.add(allItems.get(itemIndex++));
                         }
 
-                        Piece piece = new Piece(new HeroAndMonsterContainer());
+                        Piece piece = new Piece(new HeroAndMonsterContainer(null,null));
                         board[row][col] = new Boardcells(row, col, State.NEXUS, piece);
                         Market market = new Market(marketItems);
                         board[row][col].setMarket(market);
@@ -49,7 +49,7 @@ public class LegendBoard extends Board {
                     board[row][col] = new Boardcells(row, col, State.INACCESSIBLE, null);
                 } else {
                     // Randomly assign other space types
-                    Piece piece = new Piece(new HeroAndMonsterContainer());
+                    Piece piece = new Piece(new HeroAndMonsterContainer(null,null));
                     board[row][col] = new Boardcells(row, col, getRandomState(), piece);
                 }
             }

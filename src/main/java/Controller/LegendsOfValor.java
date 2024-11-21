@@ -2,6 +2,7 @@ package Controller;
 
 import Entity.Board.*;
 import Entity.Human.Hero;
+import Entity.Market.Market;
 import Entity.Monster.Monster;
 import Entity.Team;
 import Repository.Event;
@@ -16,6 +17,8 @@ import java.util.List;
 public class LegendsOfValor implements Game{
 
     Event heroEvent =new HeroEventImp();
+
+    MarketEvent marketEvent =new MarketEvent();
 
     Event monsterEvent = new MonsterEventImp();
     private Team<Hero> heroTeam = new Team<>();
@@ -43,6 +46,8 @@ public class LegendsOfValor implements Game{
    private HashMap<String, Integer> HeroDeadPool =new HashMap<>();
 
    private HashMap<String, Integer> MonsterDeadPool =new HashMap<>();
+
+   private BattleEvent battleEvent =new BattleEvent();
 
 
 
@@ -146,13 +151,15 @@ public class LegendsOfValor implements Game{
     @Override
     public void displayInstructions() {
         System.out.println("Hero Actions in Legends of Valor:");
-        System.out.println("1. Change Weapon or Armor");
+        System.out.println("1. Change Weapon");
         System.out.println("2. Use a Potion");
         System.out.println("3. Attack");
         System.out.println("4. Cast a Spell");
         System.out.println("5. Move");
         System.out.println("6. Teleport");
         System.out.println("7. Recall");
+        System.out.println("8. Change Armor");
+        System.out.println("9. Enter Market");
     }
 
 
@@ -223,15 +230,25 @@ public class LegendsOfValor implements Game{
      * Checks if a target cell is occupied by another hero.
      */
     private boolean isCellOccupiedByHero(int row, int col) {
+        // Ensure the cell is within bounds
+        if (!board.isWithinBounds(row, col)) {
+            return false; // Out of bounds, no hero
+        }
+
+        // Retrieve the container at the cell
         HeroAndMonsterContainer container =
                 (HeroAndMonsterContainer) board.getCell(row, col).getPiece().getEvent();
+
+        // Check if a hero exists in the container
         return container != null && container.getHero() != null;
     }
+
 
     /**
      * Checks if the hero is trying to move behind a monster.
      */
-    private boolean isMovingBehindMonster(int newRow, int newCol, Hero hero) {
+    private boolean
+    isMovingBehindMonster(int newRow, int newCol, Hero hero) {
         int curRow = hero.getRow();
         int curCol = hero.getCol();
 
@@ -292,8 +309,10 @@ public class LegendsOfValor implements Game{
     }
 
     public void move(Hero hero) {
-        while (true) { // Loop until a valid move is made
+        while (true) { // Loop until a valid move is made or the hero chooses to return
             // Display move options
+            board.print();
+            System.out.println();
             System.out.println("Choose a direction to move:");
             System.out.println("1. North");
             System.out.println("2. West");
@@ -301,12 +320,13 @@ public class LegendsOfValor implements Game{
             System.out.println("4. East");
             System.out.println("5. Return to the previous menu");
 
+
             int direction = Utils.getIntInRange("Enter direction (1-5): ", 1, 5);
 
             // Handle "Return" option
             if (direction == 5) {
                 System.out.println("Returning to the previous menu.");
-                return;
+                return; // End move without ending the hero's turn
             }
 
             // Determine new position based on direction
@@ -333,17 +353,21 @@ public class LegendsOfValor implements Game{
                     continue;
             }
 
-            // Validate the move and handle encounters
+
+
+            // Check for state changes or encounters after moving
             moveAndCheckForEncounter(newRow, newCol, hero);
 
-            // If the move is valid, exit the loop
-            if (isValidMove(newRow, newCol, hero)) {
+            if((hero.getRow() == newRow) && (hero.getCol() == newCol)){
                 endTurn = true;
-
                 break;
             }
+
+
+
         }
     }
+
 
     private List<Monster> getNeighborMonsters(int row, int col) {
         List<Monster> res = new ArrayList<>();
@@ -385,7 +409,7 @@ public class LegendsOfValor implements Game{
         // Check for nearby heroes
         List<Hero> nearbyHeroes = getNeighborHeroes(currentRow, currentCol);
         if (!nearbyHeroes.isEmpty()) {
-            // If heroes are nearby, attack the first one
+            // Attack the first hero in the list
             Hero target = nearbyHeroes.get(0);
             System.out.println(monster.getName() + " attacks " + target.getName() + "!");
             monsterEvent.attack(target, monster);
@@ -398,16 +422,27 @@ public class LegendsOfValor implements Game{
             return; // End the monster's turn after attacking
         }
 
-        // If no heroes are nearby, move forward
+        // If no heroes are nearby, attempt to move forward
         int newRow = currentRow + 1; // Monsters move south (toward the heroes' Nexus)
-        if (board.isWithinBounds(newRow, currentCol) && board.getCell(newRow, currentCol).getState() != State.INACCESSIBLE) {
-            // Ensure the next cell is not occupied by another monster
+
+        // Validate move
+        if (board.isWithinBounds(newRow, currentCol) &&
+                board.getCell(newRow, currentCol).getState() != State.INACCESSIBLE) {
+
+            // Check if the path is blocked
+            boolean isBlockedByHero = isCellOccupiedByHero(newRow, currentCol) ||
+                    isCellOccupiedByHero(currentRow, currentCol - 1) ||
+                    isCellOccupiedByHero(currentRow, currentCol + 1);
+
+            // Check if the cell already contains another monster
             HeroAndMonsterContainer container = (HeroAndMonsterContainer) board.getCell(newRow, currentCol).getPiece().getEvent();
-            if (container == null || container.getMonster() == null) {
+            boolean isOccupiedByMonster = container != null && container.getMonster() != null;
+
+            if (!isBlockedByHero && !isOccupiedByMonster) {
                 System.out.println(monster.getName() + " moves forward.");
                 updateMonsterPosition(newRow, currentCol, monster);
 
-                // Check if the monster reached the last row (heroes' Nexus)
+                // Check if the monster reached the Nexus
                 if (newRow == 7) {
                     System.out.println(monster.getName() + " has reached the heroes' Nexus! Monsters win!");
                     monsterWin = true; // Flag the game as over
@@ -420,23 +455,26 @@ public class LegendsOfValor implements Game{
         }
     }
 
+
+
+
     // Handle a hero's turn
     private void heroTurn(Hero hero) {
         while (!endTurn) {
             displayInstructions();
-            int choice = Utils.getIntInRange("Choose an action (1-7): ", 1, 7);
+            int choice = Utils.getIntInRange("Choose an action (1-9): ", 1, 9);
             switch (choice) {
                 case 1:
-                    // Change Weapon or Armor
+                    battleEvent.useWeapon(hero);
                     break;
                 case 2:
-                    // Use a Potion
+                    endTurn = battleEvent.usePotion(hero);
                     break;
                 case 3:
-                    attack(hero);
+                    endTurn = attack(hero);
                     break;
                 case 4:
-                    // Cast a Spell
+                    endTurn = castSpell(hero);
                     break;
                 case 5:
                     move(hero);
@@ -446,6 +484,21 @@ public class LegendsOfValor implements Game{
                     break;
                 case 7:
                     recallToNexus(hero);
+                    endTurn = true;
+                    break;
+                case 8:
+                    battleEvent.useArmor(hero);
+                    break;
+                case 9:
+                    State curState = board.getCell(hero.getRow(), hero.getCol()).getState();
+                    if(curState != State.NEXUS){
+                        System.out.println("There is not Market Here, Go back to nexus");
+                        break;
+                    }
+                    Market market = board.getCell(hero.getRow(), hero.getCol()).getMarket();
+                    Team temTeam =new Team();
+                    temTeam.addMember(hero);
+                    marketEvent.action(market,temTeam);
                     break;
                 default:
                     System.out.println("Invalid choice. Try again.");
@@ -456,11 +509,11 @@ public class LegendsOfValor implements Game{
 
 
 
-    private void attack(Hero hero) {
+    private boolean attack(Hero hero) {
         List<Monster> nearbyMonsters = getNeighborMonsters(hero.getRow(), hero.getCol());
         if (nearbyMonsters.isEmpty()) {
             System.out.println("No monsters nearby to attack.");
-            return;
+            return false;
         }
 
         System.out.println("Choose a monster to attack:");
@@ -474,11 +527,41 @@ public class LegendsOfValor implements Game{
         heroEvent.attack(target,hero);
 
 
+
         if (!target.isAlive()) {
             System.out.println(target.getName() + " is defeated!");
             removeMonster(target);
         }
+        return true;
     }
+
+    private boolean castSpell(Hero hero) {
+        List<Monster> nearbyMonsters = getNeighborMonsters(hero.getRow(), hero.getCol());
+        if (nearbyMonsters.isEmpty()) {
+            System.out.println("No monsters nearby to cast Spell.");
+            return false;
+        }
+
+        System.out.println("Choose a monster to cast spell:");
+        for (int i = 0; i < nearbyMonsters.size(); i++) {
+            System.out.println((i + 1) + ". " + nearbyMonsters.get(i).getName());
+        }
+
+        int choice = Utils.getIntInRange("Enter monster number: ", 1, nearbyMonsters.size());
+        Monster target = nearbyMonsters.get(choice - 1);
+
+      boolean res =  battleEvent.useSpell(hero,target);
+
+
+
+        if (!target.isAlive()) {
+            System.out.println(target.getName() + " is defeated!");
+            removeMonster(target);
+        }
+
+        return res;
+    }
+
 
 
     private void recallToNexus(Hero hero) {

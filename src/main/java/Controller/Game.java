@@ -3,6 +3,7 @@ package Controller;
 import Entity.Human.Hero;
 import Entity.Team;
 
+//Game interface
 public interface Game {
     public void Start();
 

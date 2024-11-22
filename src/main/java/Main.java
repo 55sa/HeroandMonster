@@ -1,4 +1,5 @@
 import Controller.Game;
+import Controller.Launcher;
 import Controller.LegendsOfValor;
 import Controller.MainEvent;
 import Entity.Board.Board;
@@ -21,11 +22,9 @@ public class Main {
 
 
 public static void main(String[] args){
-//    MainEvent game =new MainEvent();
-//    game.Start();
 
-    Game game=new LegendsOfValor();
-    game.Start();
+    Launcher.launch();
+
 }
 
 }

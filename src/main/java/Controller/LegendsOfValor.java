@@ -12,6 +12,7 @@ import java.util.*;
 
 import static Util.Utils.random;
 
+//Legends Of Valor game frontend
 public class LegendsOfValor implements Game{
 
     Event heroEvent =new HeroEventImp();
@@ -77,7 +78,7 @@ public class LegendsOfValor implements Game{
 
     public void Start() {
         musicPlayer = new MusicPlayer();  // Initialize the MusicPlayer
-        musicPlayer.playMusic("DataBase/background-music.wav");
+
         System.out.println("Welcome to Legends Of Valor!");
 
         // Step 1: Create hero team
@@ -115,7 +116,7 @@ public class LegendsOfValor implements Game{
 
             board.print();
         }
-        musicPlayer.stopMusic();
+
     }
 
     // Initialize hero positions on the board
@@ -778,7 +779,7 @@ public class LegendsOfValor implements Game{
        respawnDeadHeroes();
 
         // Spawn new monsters
-        if (roundCounter % 9 == 0) spawnNewMonsters();
+        if (roundCounter % 8 == 0) spawnNewMonsters();
     }
 
 

@@ -171,6 +171,7 @@ public class LegendsOfValor implements Game{
         System.out.println("7. Recall");
         System.out.println("8. Change Armor");
         System.out.println("9. Enter Market");
+        System.out.println("10. Display Attribute");
         System.out.println("0. Skip round");
     }
 
@@ -189,17 +190,17 @@ public class LegendsOfValor implements Game{
 
         State curState = board.getCell(newRow, newCol).getState();
 
-        if(curState == State.BUSH){
-            hero.setDexterity((int) (hero.getDexterity() * 0.1+ hero.getDexterity()));
-        }
-        else if(curState == State.CAVE){
+        if (curState == State.BUSH) {
+            hero.setDexterity((int) (hero.getDexterity() * 0.1 + hero.getDexterity()));
+            System.out.println(hero.getName() + " has entered a BUSH! Dexterity increased to " + hero.getDexterity());
+        } else if (curState == State.CAVE) {
             hero.setAgility((int) (hero.getAgility() * 1.1));
-
-        }
-        else if(curState == State.Koulou){
+            System.out.println(hero.getName() + " has entered a CAVE! Agility increased to " + hero.getAgility());
+        } else if (curState == State.Koulou) {
             hero.setStrength((int) (hero.getStrength() * 1.1));
-
+            System.out.println(hero.getName() + " has entered a KOULOU! Strength increased to " + hero.getStrength());
         }
+
 
         if (newRow == 0){
             heroWin = true;
@@ -490,7 +491,7 @@ public class LegendsOfValor implements Game{
     private void heroTurn(Hero hero) {
         while (!endTurn) {
             displayInstructions();
-            int choice = Utils.getIntInRange("Choose an action (0-9): ", 0, 9);
+            int choice = Utils.getIntInRange("Choose an action (0-10): ", 0, 10);
             switch (choice) {
                 case 1:
                     battleEvent.useWeapon(hero);
@@ -508,7 +509,7 @@ public class LegendsOfValor implements Game{
                     move(hero);
                     break;
                 case 6:
-                    // Teleport
+                    teleport(hero);
                     break;
                 case 7:
                     recallToNexus(hero);
@@ -527,6 +528,9 @@ public class LegendsOfValor implements Game{
                     Team temTeam =new Team();
                     temTeam.addMember(hero);
                     marketEvent.action(market,temTeam);
+                    break;
+                case 10:
+                    hero.displayStats();
                     break;
                 case 0:
                     endTurn = true;
@@ -770,6 +774,113 @@ public class LegendsOfValor implements Game{
 
         // Spawn new monsters
         if (roundCounter % 9 == 0) spawnNewMonsters();
+    }
+
+
+    private void teleport(Hero hero) {
+        System.out.println("Choose a hero to teleport to:");
+        // Filter out the current hero
+        List<Hero> otherHeroes = new ArrayList<>();
+        for (Hero h : HeroLivePool) {
+            if (!h.equals(hero)) { // Exclude the current hero
+                otherHeroes.add(h);
+            }
+        }
+
+        if (otherHeroes.isEmpty()) {
+            System.out.println("No other heroes available to teleport to.");
+            return;
+        }
+
+        // Display available heroes to teleport to
+        for (int i = 0; i < otherHeroes.size(); i++) {
+            Hero target = otherHeroes.get(i);
+            System.out.println((i + 1) + ". " + target.getName() + " at (" + target.getRow() + "," + target.getCol() + ")");
+        }
+
+        // Get the player's choice of target hero
+        int choice = Utils.getIntInRange("Choose a hero (1-" + otherHeroes.size() + "): ", 1, otherHeroes.size());
+        Hero targetHero = otherHeroes.get(choice - 1);
+
+        // Ensure the target hero is in a different lane
+        int targetCol = targetHero.getCol();
+        int heroCol = hero.getCol();
+        if (getLaneIndex(targetCol) == getLaneIndex(heroCol)) {
+            System.out.println("Cannot teleport to a hero in the same lane.");
+            return;
+        }
+
+        // Get valid positions around the target hero
+        List<int[]> validPositions = getValidTeleportPositions(targetHero);
+
+        if (validPositions.isEmpty()) {
+            System.out.println("No valid positions available for teleporting to " + targetHero.getName() + ".");
+            return;
+        }
+
+        // Display valid positions
+        System.out.println("Available positions:");
+        for (int i = 0; i < validPositions.size(); i++) {
+            int[] pos = validPositions.get(i);
+            System.out.println((i + 1) + ". (" + pos[0] + "," + pos[1] + ")");
+        }
+
+        // Get the player's choice of position
+        int positionChoice = Utils.getIntInRange("Choose a position (1-" + validPositions.size() + "): ", 1, validPositions.size());
+        int[] chosenPosition = validPositions.get(positionChoice - 1);
+
+        // Perform teleportation
+        updateHeroPosition(chosenPosition[0], chosenPosition[1], hero);
+        endTurn = true;
+        System.out.println(hero.getName() + " teleported to position (" + chosenPosition[0] + "," + chosenPosition[1] + ").");
+    }
+
+
+    private int getLaneIndex(int col) {
+        if (col == 0) return 0; // Top lane
+        if (col == 3) return 1; // Middle lane
+        if (col == 6) return 2; // Bottom lane
+        return -1; // Invalid lane
+    }
+
+
+    private List<int[]> getValidTeleportPositions(Hero targetHero) {
+        List<int[]> positions = new ArrayList<>();
+        int row = targetHero.getRow();
+        int col = targetHero.getCol();
+
+        // Define potential positions around the target hero
+        int[][] directions = {
+                {1, 0},  // South
+                {0, -1}, // West
+                {0, 1}   // East
+        };
+
+        for (int[] dir : directions) {
+            int newRow = row + dir[0];
+            int newCol = col + dir[1];
+
+            // Ensure the cell is within bounds
+            if (!board.isWithinBounds(newRow, newCol)) {
+                continue; // Skip out-of-bounds cells
+            }
+            if(board.getCell(newRow, newCol).getState() == State.INACCESSIBLE){
+                continue;
+            }
+
+            // Retrieve the container for the cell
+            HeroAndMonsterContainer container =
+                    (HeroAndMonsterContainer) board.getCell(newRow, newCol).getPiece().getEvent();
+
+            // Check if the position is valid
+            if (
+                    !isCellOccupiedByHero(newRow, newCol) && // Not occupied by another hero
+                    !isMovingBehindMonster(newRow, newCol, targetHero)) { // Not behind a monster
+                positions.add(new int[]{newRow, newCol});
+            }
+        }
+
+        return positions;
     }
 
 

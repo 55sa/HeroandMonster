@@ -30,6 +30,8 @@ public class LegendsOfValor implements Game{
 
    private   MainEvent HeroAndMonster =  new MainEvent();
 
+   private MusicPlayer musicPlayer;
+
    private Board board = new LegendBoard();
 
    private boolean endTurn = false;
@@ -74,6 +76,8 @@ public class LegendsOfValor implements Game{
 
 
     public void Start() {
+        musicPlayer = new MusicPlayer();  // Initialize the MusicPlayer
+        musicPlayer.playMusic("DataBase/background-music.wav");
         System.out.println("Welcome to Legends Of Valor!");
 
         // Step 1: Create hero team
@@ -111,6 +115,7 @@ public class LegendsOfValor implements Game{
 
             board.print();
         }
+        musicPlayer.stopMusic();
     }
 
     // Initialize hero positions on the board

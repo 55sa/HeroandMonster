@@ -404,7 +404,8 @@ public class LegendsOfValor implements Game{
                 {-1, 0}, // North
                 {1, 0},  // South
                 {0, -1}, // West
-                {0, 1}   // East
+                {0, 1},   // East
+                {0, 0} // Current
         };
 
         for (int[] dir : directions) {
@@ -435,9 +436,6 @@ public class LegendsOfValor implements Game{
 
         // Check for nearby heroes
         List<Hero> nearbyHeroes = getNeighborHeroes(currentRow, currentCol);
-        for(Hero hero : nearbyHeroes){
-            System.out.println(hero.getName());
-        }
         if (!nearbyHeroes.isEmpty()) {
             // Attack the first hero in the list
             Hero target = nearbyHeroes.get(0);
@@ -456,16 +454,13 @@ public class LegendsOfValor implements Game{
         int newRow = currentRow + 1; // Monsters move south (toward the heroes' Nexus)
 
         // Validate move
-        if (board.isWithinBounds(newRow, currentCol) &&
-                board.getCell(newRow, currentCol).getState() != State.INACCESSIBLE) {
+        if (board.isWithinBounds(newRow, currentCol)) {
+            HeroAndMonsterContainer container =
+                    (HeroAndMonsterContainer) board.getCell(newRow, currentCol).getPiece().getEvent();
 
-            // Check if the path is blocked
             boolean isBlockedByHero = isCellOccupiedByHero(currentRow, currentCol) ||
                     isCellOccupiedByHero(currentRow, currentCol - 1) ||
                     isCellOccupiedByHero(currentRow, currentCol + 1);
-
-            // Check if the cell already contains another monster
-            HeroAndMonsterContainer container = (HeroAndMonsterContainer) board.getCell(newRow, currentCol).getPiece().getEvent();
 
             boolean isOccupiedByMonster = container != null && container.getMonster() != null;
 
@@ -485,6 +480,7 @@ public class LegendsOfValor implements Game{
             System.out.println(monster.getName() + " cannot move forward due to an obstacle.");
         }
     }
+
 
 
 
@@ -630,7 +626,8 @@ public class LegendsOfValor implements Game{
                 {-1, 0}, // North
                 {1, 0},  // South
                 {0, -1}, // West
-                {0, 1}   // East
+                {0, 1},   // East
+                {0, 0} // Current
         };
 
         for (int[] dir : directions) {
@@ -643,6 +640,7 @@ public class LegendsOfValor implements Game{
                     HeroAndMonsterContainer container =
                             (HeroAndMonsterContainer) cell.getPiece().getEvent();
                     if (container != null && container.getHero() != null) {
+                        System.out.println("Detected hero " + container.getHero().getName() + " at (" + newRow + "," + newCol + ").");
                         heroes.add(container.getHero());
                     }
                 }
@@ -650,6 +648,7 @@ public class LegendsOfValor implements Game{
         }
         return heroes;
     }
+
 
 
     private void updateMonsterPosition(int newRow, int newCol, Monster monster) {
@@ -677,18 +676,24 @@ public class LegendsOfValor implements Game{
     }
 
     private void respawnDeadHeroes() {
-        for (Hero hero : HeroDeadPool) {
+        List<Hero> tempPool = new ArrayList<>(HeroDeadPool);
+
+        for (Hero hero : tempPool) {
 
 
                 int[] nexusPos = HeroBasePostion.get(hero.getName());
                 hero.setHP(hero.getLevel() * 100);
                 hero.setMP(hero.getLevel() * 50);
                 HeroLivePool.add(hero);
+                HeroDeadPool.remove(hero);
+
 
                 // Add hero back to the board
                 HeroAndMonsterContainer container =
                         (HeroAndMonsterContainer) board.getCell(nexusPos[0], nexusPos[1]).getPiece().getEvent();
                 container.setHero(hero);
+                hero.setRow(nexusPos[0]);
+                hero.setCol(nexusPos[1]);
 
                 System.out.println(hero.getName() + " respawns in their Nexus.");
 

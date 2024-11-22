@@ -5,20 +5,23 @@ import Entity.Human.Hero;
 import Entity.Market.Market;
 import Entity.Monster.Monster;
 import Entity.Team;
-import Repository.Event;
-import Repository.HeroEventImp;
-import Repository.MonsterEventImp;
+import Repository.*;
 import Util.Utils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+
+import static Util.Utils.random;
 
 public class LegendsOfValor implements Game{
 
     Event heroEvent =new HeroEventImp();
 
+    CharacterFactory characterFactory = new CharacterFactoryImp();
     MarketEvent marketEvent =new MarketEvent();
+
+    HashMap<String,Hero> heroNameBoard = new HashMap<>();
+
+    HashMap<String,Monster> monsterNameBoard = new HashMap<>();
 
     Event monsterEvent = new MonsterEventImp();
     private Team<Hero> heroTeam = new Team<>();
@@ -43,11 +46,15 @@ public class LegendsOfValor implements Game{
 
    private List<Hero> HeroLivePool =new ArrayList<>();
 
-   private HashMap<String, Integer> HeroDeadPool =new HashMap<>();
+   private List<Hero> HeroDeadPool =new ArrayList<>();
 
-   private HashMap<String, Integer> MonsterDeadPool =new HashMap<>();
+   private List<Monster> MonsterDeadPool =new ArrayList<>();
 
    private BattleEvent battleEvent =new BattleEvent();
+
+    private int roundCounter = 0;
+
+    int monsterId = 1;
 
 
 
@@ -99,8 +106,9 @@ public class LegendsOfValor implements Game{
                     return; // End the game
                 }
             }
+            endRound();
 
-            // Optionally update the board after each round
+
             board.print();
         }
     }
@@ -110,6 +118,7 @@ public class LegendsOfValor implements Game{
         for (int i = 0; i < heroTeam.getTeams().size(); i++) {
             Hero hero = heroTeam.getTeams().get(i);
             HeroLivePool.add(hero);
+            heroNameBoard.put(hero.getName(),hero);
 
             int heroRow = 7; // Heroes start at the bottom row
             int heroCol = getLaneCol(i); // Distribute heroes across lanes
@@ -131,6 +140,7 @@ public class LegendsOfValor implements Game{
         for (int i = 0; i < monsterTeam.getTeams().size(); i++) {
             Monster monster = monsterTeam.getTeams().get(i);
             MonsterLivePool.add(monster);
+            monsterNameBoard.put(monster.getName(),monster);
 
             int monsterRow = 0; // Monsters start at the top row
             int monsterCol = getLaneCol(i); // Distribute monsters across lanes
@@ -145,6 +155,7 @@ public class LegendsOfValor implements Game{
                     (HeroAndMonsterContainer) board.getCell(monsterRow, monsterCol).getPiece().getEvent();
             container.setMonster(monster);
         }
+        monsterId = monsterTeam.getTeams().size()+1;
     }
 
 
@@ -160,6 +171,7 @@ public class LegendsOfValor implements Game{
         System.out.println("7. Recall");
         System.out.println("8. Change Armor");
         System.out.println("9. Enter Market");
+        System.out.println("0. Skip round");
     }
 
 
@@ -423,6 +435,9 @@ public class LegendsOfValor implements Game{
 
         // Check for nearby heroes
         List<Hero> nearbyHeroes = getNeighborHeroes(currentRow, currentCol);
+        for(Hero hero : nearbyHeroes){
+            System.out.println(hero.getName());
+        }
         if (!nearbyHeroes.isEmpty()) {
             // Attack the first hero in the list
             Hero target = nearbyHeroes.get(0);
@@ -474,11 +489,12 @@ public class LegendsOfValor implements Game{
 
 
 
+
     // Handle a hero's turn
     private void heroTurn(Hero hero) {
         while (!endTurn) {
             displayInstructions();
-            int choice = Utils.getIntInRange("Choose an action (1-9): ", 1, 9);
+            int choice = Utils.getIntInRange("Choose an action (0-9): ", 0, 9);
             switch (choice) {
                 case 1:
                     battleEvent.useWeapon(hero);
@@ -516,6 +532,9 @@ public class LegendsOfValor implements Game{
                     temTeam.addMember(hero);
                     marketEvent.action(market,temTeam);
                     break;
+                case 0:
+                    endTurn = true;
+                    break;
                 default:
                     System.out.println("Invalid choice. Try again.");
             }
@@ -547,6 +566,7 @@ public class LegendsOfValor implements Game{
         if (!target.isAlive()) {
             System.out.println(target.getName() + " is defeated!");
             removeMonster(target);
+            distributeRewards(target);
         }
         return true;
     }
@@ -588,7 +608,7 @@ public class LegendsOfValor implements Game{
 
     private void removeMonster(Monster monster) {
         MonsterLivePool.remove(monster);
-        MonsterDeadPool.put(monster.getName(), 6);
+        MonsterDeadPool.add(monster);
         HeroAndMonsterContainer container =
                 (HeroAndMonsterContainer) board.getCell(monster.getRow(), monster.getCol()).getPiece().getEvent();
         container.setMonster(null);
@@ -596,7 +616,7 @@ public class LegendsOfValor implements Game{
 
     private void removeHero(Hero hero) {
         HeroLivePool.remove(hero);
-        HeroDeadPool.put(hero.getName(), 6);
+        HeroDeadPool.add(hero);
         HeroAndMonsterContainer container =
                 (HeroAndMonsterContainer) board.getCell(hero.getRow(), hero.getCol()).getPiece().getEvent();
         container.setHero(null);
@@ -655,6 +675,100 @@ public class LegendsOfValor implements Game{
             newContainer.setMonster(monster);
         }
     }
+
+    private void respawnDeadHeroes() {
+        for (Hero hero : HeroDeadPool) {
+
+
+                int[] nexusPos = HeroBasePostion.get(hero.getName());
+                hero.setHP(hero.getLevel() * 100);
+                hero.setMP(hero.getLevel() * 50);
+                HeroLivePool.add(hero);
+
+                // Add hero back to the board
+                HeroAndMonsterContainer container =
+                        (HeroAndMonsterContainer) board.getCell(nexusPos[0], nexusPos[1]).getPiece().getEvent();
+                container.setHero(hero);
+
+                System.out.println(hero.getName() + " respawns in their Nexus.");
+
+        }
+    }
+
+    private void spawnNewMonsters() {
+        int highestHeroLevel = heroTeam.getTeams().stream()
+                .mapToInt(Hero::getLevel)
+                .max()
+                .orElse(1);
+
+        String[] monsterTypes = {"dragon", "exoskeleton", "spirit"};
+
+        for (int i = 0; i < 3; i++) {
+            int spawnRow = 0; // Monsters' Nexus row
+            int spawnCol = getLaneCol(i);
+
+            // Check if lane is full
+            if (!isLaneFull(spawnCol)) {
+                String monsterType = monsterTypes[Utils.random.nextInt(monsterTypes.length)];
+                Monster newMonster = characterFactory.createMonster(
+                        monsterType, "M" + monsterId++, highestHeroLevel);
+
+                // Find an empty spot in the lane
+                for (int row = 0; row < 8; row++) {
+                    HeroAndMonsterContainer container =
+                            (HeroAndMonsterContainer) board.getCell(row, spawnCol).getPiece().getEvent();
+
+                    if (container != null && container.getMonster() == null) {
+                        container.setMonster(newMonster);
+                        MonsterLivePool.add(newMonster);
+                        newMonster.setCol(spawnCol);
+                        newMonster.setRow(spawnRow);
+                        monsterNameBoard.put(newMonster.getName(), newMonster);
+                        System.out.println("New monster " + newMonster.getName() + " spawned at lane " + i + ", row " + row + ".");
+                        break; // Stop after placing one monster
+                    }
+                }
+            }
+        }
+    }
+
+    private boolean isLaneFull(int laneCol) {
+        for (int row = 0; row < 8; row++) {
+            HeroAndMonsterContainer container =
+                    (HeroAndMonsterContainer) board.getCell(row, laneCol).getPiece().getEvent();
+            if (container == null || container.getMonster() == null) {
+                return false; // Found an empty spot
+            }
+        }
+        return true; // Lane is full
+    }
+
+
+    private void distributeRewards(Monster monster) {
+        int goldReward = 500 * monster.getLevel();
+        int expReward = 2 * monster.getLevel();
+
+        for (Hero hero : HeroLivePool) {
+            hero.setGold(hero.getGold() + goldReward);
+            hero.addExp( expReward);
+            System.out.println(hero.getName() + " gains " + goldReward + " gold and " + expReward + " experience.");
+        }
+    }
+
+
+
+    private void endRound() {
+        roundCounter++;
+
+        // Respawn heroes
+       respawnDeadHeroes();
+
+        // Spawn new monsters
+        if (roundCounter % 9 == 0) spawnNewMonsters();
+    }
+
+
+
 
 
 

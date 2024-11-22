@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Scanner;
 
 //Battle Page of the game
-public class BattleEvent {
+public class BattleEvent  {
 
     private CharacterFactory characterFactory = new CharacterFactoryImp();
     private ItemFactory itemFactory = new ItemFactoryImp();

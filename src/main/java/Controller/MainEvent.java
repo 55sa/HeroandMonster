@@ -226,5 +226,23 @@ public class MainEvent implements Game{
         }
     }
 
+    public void rewardHeroes(Team<Hero> heroTeam) {
+        int expReward = 100;
+        int goldReward = 50;
+
+        System.out.println("Distributing rewards to surviving heroes...");
+        for (Hero hero : heroTeam.getTeams()) {
+            if (hero.isAlive()) {
+                hero.setHP((int) (hero.getHP() * 1.1));
+                hero.setMP((int) (hero.getMP() * 1.1));
+                hero.addExp(expReward);
+                hero.setGold(hero.getGold() + goldReward);
+                System.out.println(hero.getName() + " receives " + expReward + " EXP and " + goldReward + " gold.");
+            } else {
+                hero.revive();
+            }
+        }
+    }
+
 
 }

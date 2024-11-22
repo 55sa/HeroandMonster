@@ -17,7 +17,7 @@ public class Utils {
 
     private static CharacterFactory characterFactory =new CharacterFactoryImp();
 
-    private static Random random =new Random();
+    public static Random random =new Random();
 
     /**
      * Validates an integer input within a specific range.

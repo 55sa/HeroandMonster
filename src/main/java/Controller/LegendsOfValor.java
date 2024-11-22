@@ -388,6 +388,92 @@ public class LegendsOfValor implements Game{
         }
     }
 
+    // Functionality for hero teleportation
+    private boolean teleport(Hero hero) {
+        System.out.println("Choose a target hero to teleport near:");
+        
+        // List all heroes in the live pool except the current hero
+        List<Hero> targetHeroes = new ArrayList<>();
+        for (Hero target : HeroLivePool) {
+            if (!target.equals(hero)) {
+                targetHeroes.add(target);
+            }
+        }
+    
+        // If no valid heroes are available
+        if (targetHeroes.isEmpty()) {
+            System.out.println("No other heroes are available to teleport to.");
+            return false;
+        }
+    
+        // Display target heroes
+        for (int i = 0; i < targetHeroes.size(); i++) {
+            Hero target = targetHeroes.get(i);
+            System.out.println((i + 1) + ". " + target.getName() + " at (" + target.getRow() + ", " + target.getCol() + ")");
+        }
+    
+        int choice = Utils.getIntInRange("Select a hero to teleport to (1-" + targetHeroes.size() + "): ", 1, targetHeroes.size()+1);
+        System.out.println("choice is: " + choice);
+        Hero targetHero = targetHeroes.get(choice - 1);
+    
+        // Check lane restrictions
+        // int heroLane = getLaneCol(hero.getCol());
+        int heroLane = hero.getCol();
+        // System.out.println("hero lane is: " + heroLane);
+        // System.out.println("target col is: " + targetHero.getCol());
+        // int targetLane = getLaneCol(targetHero.getCol());
+        int targetLane = targetHero.getCol();
+        // System.out.println("target lane is: " + targetLane);
+        if (heroLane == targetLane) {
+            System.out.println("Teleportation within the same lane is not allowed.");
+            return false;
+        }
+    
+        // Determine potential adjacent positions
+        int[][] adjacentPositions = {
+            {targetHero.getRow() - 1, targetHero.getCol()}, // North
+            {targetHero.getRow() + 1, targetHero.getCol()}, // South
+            {targetHero.getRow(), targetHero.getCol() - 1}, // West
+            {targetHero.getRow(), targetHero.getCol() + 1}  // East
+        };
+    
+        // Find a valid position to teleport
+        for (int[] pos : adjacentPositions) {
+            int newRow = pos[0];
+            int newCol = pos[1];
+    
+            // Validate the cell
+            if (board.isWithinBounds(newRow, newCol)
+                    && !isCellOccupiedByHero(newRow, newCol)
+                    && newRow >= targetHero.getRow() // Prevent teleporting ahead
+                    && !isMonsterBlocking(newRow, newCol, targetLane)) {
+    
+                // Perform the teleport
+                updateHeroPosition(newRow, newCol, hero);
+                System.out.println(hero.getName() + " teleported to (" + newRow + ", " + newCol + ") near " + targetHero.getName());
+                return true;
+            }
+        }
+    
+        // If no valid position was found
+        System.out.println("No valid position available to teleport to.");
+        return false;
+    }
+
+    private boolean isMonsterBlocking(int row, int col, int lane) {
+        // Get the monster column for the lane
+        int laneCol = getLaneCol(lane);
+    
+        // Check all rows above the target position in the lane
+        for (int r = 0; r < row; r++) {
+            if (isMonsterInCell(r, laneCol)) {
+                System.out.println("Teleport blocked by a monster in the lane.");
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     private List<Monster> getNeighborMonsters(int row, int col) {
         List<Monster> res = new ArrayList<>();
@@ -502,6 +588,9 @@ public class LegendsOfValor implements Game{
                     break;
                 case 6:
                     // Teleport
+                    if (teleport(hero)) {
+                        endTurn = true;
+                    }
                     break;
                 case 7:
                     recallToNexus(hero);

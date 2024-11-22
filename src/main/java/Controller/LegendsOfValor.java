@@ -199,6 +199,11 @@ public class LegendsOfValor implements Game{
      * Validates if the move is legal based on the game rules.
      */
     private boolean isValidMove(int newRow, int newCol, Hero hero) {
+        int currentRow = hero.getRow();
+        int currentCol = hero.getCol();
+
+        System.out.println("Checking move for Hero " + hero.getName() + ": from (" + currentRow + "," + currentCol + ") to (" + newRow + "," + newCol + ")");
+
         // Check if the target cell is within bounds
         if (!board.isWithinBounds(newRow, newCol)) {
             System.out.println("Move is out of bounds.");
@@ -217,14 +222,19 @@ public class LegendsOfValor implements Game{
             return false;
         }
 
+
+
         // Check if the hero is trying to move behind a monster
         if (isMovingBehindMonster(newRow, newCol, hero)) {
             System.out.println("Cannot move behind a monster without killing it.");
             return false;
         }
 
+
+
         return true;
     }
+
 
     /**
      * Checks if a target cell is occupied by another hero.
@@ -254,12 +264,11 @@ public class LegendsOfValor implements Game{
     /**
      * Checks if the hero is trying to move behind a monster.
      */
-    private boolean
-    isMovingBehindMonster(int newRow, int newCol, Hero hero) {
+    private boolean isMovingBehindMonster(int newRow, int newCol, Hero hero) {
         int curRow = hero.getRow();
         int curCol = hero.getCol();
 
-      if(newRow > curRow){
+      if(newRow < curRow){
           return isMonsterInCell(curRow, curCol) || // Current cell
                   isMonsterInCell(curRow, curCol - 1) || // Left cell
                   isMonsterInCell(curRow, curCol + 1);  // Right cell
@@ -271,26 +280,25 @@ public class LegendsOfValor implements Game{
      * Checks if a specific cell is occupied by a monster.
      */
     private boolean isMonsterInCell(int row, int col) {
-        // Ensure the row and column are within the board bounds
         if (!board.isWithinBounds(row, col)) {
-            return false; // Out of bounds, no monster
+            System.out.println("Cell (" + row + "," + col + ") is out of bounds.");
+            return false;
         }
 
-        // Retrieve the cell at the specified position
         Boardcells cell = board.getCell(row, col);
-
-        // Check if the cell is inaccessible
-        if (cell.getState() == State.INACCESSIBLE) {
-            return false; // Inaccessible cells cannot have monsters
+        if (cell == null || cell.getPiece() == null) {
+            System.out.println("Cell (" + row + "," + col + ") is empty.");
+            return false;
         }
 
-        // Retrieve the container in the cell
         HeroAndMonsterContainer container =
                 (HeroAndMonsterContainer) cell.getPiece().getEvent();
+        boolean hasMonster = container != null && container.getMonster() != null;
 
-        // Check if the container has a monster
-        return container != null && container.getMonster() != null;
+        System.out.println("Cell (" + row + "," + col + ") has monster: " + hasMonster);
+        return hasMonster;
     }
+
 
 
 
@@ -437,12 +445,13 @@ public class LegendsOfValor implements Game{
                 board.getCell(newRow, currentCol).getState() != State.INACCESSIBLE) {
 
             // Check if the path is blocked
-            boolean isBlockedByHero = isCellOccupiedByHero(newRow, currentCol) ||
+            boolean isBlockedByHero = isCellOccupiedByHero(currentRow, currentCol) ||
                     isCellOccupiedByHero(currentRow, currentCol - 1) ||
                     isCellOccupiedByHero(currentRow, currentCol + 1);
 
             // Check if the cell already contains another monster
             HeroAndMonsterContainer container = (HeroAndMonsterContainer) board.getCell(newRow, currentCol).getPiece().getEvent();
+
             boolean isOccupiedByMonster = container != null && container.getMonster() != null;
 
             if (!isBlockedByHero && !isOccupiedByMonster) {

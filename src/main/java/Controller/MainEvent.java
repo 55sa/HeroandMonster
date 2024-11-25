@@ -22,6 +22,8 @@ public class MainEvent implements Game{
     private BattleEvent battleEvent = new BattleEvent();
     private Scanner scanner = new Scanner(System.in);
 
+    private MusicPlayer musicPlayer;
+
     private State pre = heroBoard.getCell(7, 0).getState();
 
 
@@ -161,6 +163,9 @@ public class MainEvent implements Game{
 
      char choice = '@';
     public void Start() {
+        musicPlayer = new MusicPlayer();  // Initialize the MusicPlayer
+        musicPlayer.playMusic("DataBase/hero-and-monster.wav");
+
         System.out.println("Welcome to Hero and Monster!");
 
         // Step 1: Create hero team
@@ -224,6 +229,7 @@ public class MainEvent implements Game{
                     System.out.println("Invalid command. Please try again.");
             }
         }
+        musicPlayer.stopMusic();
     }
 
     public void rewardHeroes(Team<Hero> heroTeam) {

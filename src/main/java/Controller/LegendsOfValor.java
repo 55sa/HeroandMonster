@@ -78,6 +78,7 @@ public class LegendsOfValor implements Game{
 
     public void Start() {
         musicPlayer = new MusicPlayer();  // Initialize the MusicPlayer
+        musicPlayer.playMusic("DataBase/legends-of-valor.wav");
 
         System.out.println("Welcome to Legends Of Valor!");
 
@@ -116,7 +117,7 @@ public class LegendsOfValor implements Game{
 
             board.print();
         }
-
+        musicPlayer.stopMusic();
     }
 
     // Initialize hero positions on the board
